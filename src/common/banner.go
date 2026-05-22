@@ -51,6 +51,6 @@ func PrintBanner(config BannerConfig) {
 	fmt.Println()
 }
 
-func printRow(label string, value string) {
+func printRow(label, value string) {
 	fmt.Printf("%s%-9s%s %s\n", green, label+":", reset, value)
 }

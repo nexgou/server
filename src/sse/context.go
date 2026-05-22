@@ -23,7 +23,7 @@ type SSEContext struct {
 	params  map[string]string
 }
 
-// newSSEContext creates and initialises an SSEContext.
+// newSSEContext creates and initializes an SSEContext.
 // It writes the required SSE response headers and returns an error if the
 // ResponseWriter does not support flushing (required for streaming).
 func newSSEContext(w http.ResponseWriter, r *http.Request, params map[string]string) (*SSEContext, error) {
@@ -68,7 +68,7 @@ func (c *SSEContext) SendNamed(event, data string) error {
 	return c.writeAndFlush("event: " + event + "\n" + formatData(data))
 }
 
-// SendJSON serialises v as JSON and sends it as an unnamed data event.
+// SendJSON serializes v as JSON and sends it as an unnamed data event.
 //
 //	ctx.SendJSON(map[string]any{"cpu": 42})
 //	// →  data: {"cpu":42}\n\n
@@ -80,7 +80,7 @@ func (c *SSEContext) SendJSON(v any) error {
 	return c.Send(string(b))
 }
 
-// SendNamedJSON serialises v as JSON and sends it as a named event.
+// SendNamedJSON serializes v as JSON and sends it as a named event.
 //
 //	ctx.SendNamedJSON("metrics", payload)
 //	// →  event: metrics\n

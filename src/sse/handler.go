@@ -27,7 +27,7 @@ type HandlerFunc func(*SSEContext) error
 // ToHTTPHandler wraps an SSE HandlerFunc into a standard common.HandlerFunc
 // so it can be registered on any HTTP route using the normal nexgou helpers.
 //
-// The wrapper initialises the SSEContext (writes SSE headers, verifies Flusher
+// The wrapper initializes the SSEContext (writes SSE headers, verifies Flusher
 // support) and delegates to the SSE handler. If the ResponseWriter does not
 // support flushing it responds with HTTP 500 immediately.
 //

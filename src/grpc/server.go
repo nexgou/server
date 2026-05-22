@@ -6,11 +6,12 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/nexgou/server/src/common"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+
+	"github.com/nexgou/server/src/common"
 )
 
 // GRPCServer wraps a *grpc.Server and integrates Nexgou's Guard system
@@ -113,9 +114,9 @@ func (g *GRPCServer) guardInterceptor(
 // "/greeter.Greeter/SayHello" → looks up service "greeter.Greeter".
 func (g *GRPCServer) guardsForMethod(fullMethod string) []common.Guard {
 	svcName := serviceNameFromMethod(fullMethod)
-	for _, r := range g.routes {
-		if r.Desc.ServiceName == svcName {
-			return r.Guards
+	for i := range g.routes {
+		if g.routes[i].Desc.ServiceName == svcName {
+			return g.routes[i].Guards
 		}
 	}
 	return nil
@@ -130,7 +131,8 @@ func (g *GRPCServer) printRoutes(port int) {
 
 	fmt.Printf("\n%s[Nexgou gRPC]%s listening on :%d\n", cyan, reset, port)
 	fmt.Printf("%s────────────────────────────────%s\n", gray, reset)
-	for _, r := range g.routes {
+	for i := range g.routes {
+		r := &g.routes[i]
 		badge := fmt.Sprintf("%s🌐 public%s", gray, reset)
 		if len(r.Guards) > 0 {
 			badge = fmt.Sprintf("🔒 %s%d guard(s)%s", dim, len(r.Guards), reset)
@@ -167,7 +169,7 @@ func grpcContextToHTTPContext(ctx context.Context, fullMethod string) *common.Co
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
 		for k, vals := range md {
 			for _, v := range vals {
-				r.Header.Add(http.CanonicalHeaderKey(k), v)
+				r.Header.Add(k, v)
 			}
 		}
 	}
@@ -212,7 +214,7 @@ func httpStatusToGRPCCode(httpStatus int) codes.Code {
 // serviceNameFromMethod extracts the service name from a gRPC full method path.
 // "/greeter.Greeter/SayHello" → "greeter.Greeter"
 func serviceNameFromMethod(fullMethod string) string {
-	if len(fullMethod) == 0 || fullMethod[0] != '/' {
+	if fullMethod == "" || fullMethod[0] != '/' {
 		return fullMethod
 	}
 	trimmed := fullMethod[1:]
@@ -243,6 +245,6 @@ func streamLabel(s grpc.StreamDesc) string {
 // Guards that attempt to write a response (e.g. ctx.JSON) will silently discard output.
 type noopResponseWriter struct{}
 
-func (noopResponseWriter) Header() http.Header       { return http.Header{} }
+func (noopResponseWriter) Header() http.Header         { return http.Header{} }
 func (noopResponseWriter) Write(b []byte) (int, error) { return len(b), nil }
 func (noopResponseWriter) WriteHeader(_ int)           {}

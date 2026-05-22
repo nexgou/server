@@ -20,11 +20,6 @@ type GRPCContext struct {
 	fullMethod string
 }
 
-// newGRPCContext creates a GRPCContext from a gRPC server interceptor invocation.
-func newGRPCContext(ctx context.Context, fullMethod string) *GRPCContext {
-	return &GRPCContext{ctx: ctx, fullMethod: fullMethod}
-}
-
 // Context returns the underlying Go context.Context for this RPC.
 // It carries the deadline, cancellation signal, and any values attached by
 // middleware or the client.

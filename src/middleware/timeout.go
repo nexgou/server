@@ -68,6 +68,6 @@ func runWithTimeout(ctx *common.Context, d time.Duration, next common.HandlerFun
 		if reqCtx.Err() == context.DeadlineExceeded {
 			return common.NewHttpException(http.StatusRequestTimeout, "request timeout")
 		}
-		return common.NewHttpException(http.StatusServiceUnavailable, "request cancelled")
+		return common.NewHttpException(http.StatusServiceUnavailable, "request canceled")
 	}
 }

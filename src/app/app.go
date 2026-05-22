@@ -8,8 +8,8 @@ import (
 
 	"github.com/nexgou/server/src/common"
 	"github.com/nexgou/server/src/core"
-	"github.com/nexgou/server/src/router"
 	nexgougrpc "github.com/nexgou/server/src/grpc"
+	"github.com/nexgou/server/src/router"
 	nexgouws "github.com/nexgou/server/src/websocket"
 )
 
@@ -117,14 +117,14 @@ func (a *App) printRoutes() {
 		"DELETE": "\033[31m",
 	}
 	reset := "\033[0m"
-	dim   := "\033[2m"
-	gray  := "\033[90m"
+	dim := "\033[2m"
+	gray := "\033[90m"
 
 	routes := a.router.Routes()
 
 	// Calculate column widths from actual data.
 	maxMethod := 6
-	maxPath   := 15
+	maxPath := 15
 	for _, r := range routes {
 		if len(r.Method) > maxMethod {
 			maxMethod = len(r.Method)
@@ -154,7 +154,7 @@ func (a *App) printRoutes() {
 		}
 
 		method := fmt.Sprintf("%-*s", maxMethod, r.Method)
-		path   := fmt.Sprintf("%-*s", maxPath, r.Path)
+		path := fmt.Sprintf("%-*s", maxPath, r.Path)
 
 		fmt.Printf("%s%s%s   %s%s%s   %s\n", color, method, reset, dim, path, reset, badge)
 	}
@@ -232,8 +232,9 @@ func (a *App) walkModule(m common.IModule, c *core.Container) {
 			if a.grpcServer == nil {
 				a.grpcServer = nexgougrpc.NewGRPCServer()
 			}
-			for _, route := range grpcCtrl.RegisterGRPC() {
-				a.grpcServer.RegisterRoute(route)
+			grpcRoutes := grpcCtrl.RegisterGRPC()
+			for i := range grpcRoutes {
+				a.grpcServer.RegisterRoute(grpcRoutes[i])
 			}
 		}
 	}

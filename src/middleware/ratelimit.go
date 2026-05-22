@@ -28,14 +28,14 @@ import (
 // Usage:
 //
 //	app.Use(middleware.RateLimit(100, time.Minute))
-func RateLimit(max int, window time.Duration) common.MiddlewareFunc {
+func RateLimit(limit int, window time.Duration) common.MiddlewareFunc {
 	store := newBucketStore(window)
 	return func(next common.HandlerFunc) common.HandlerFunc {
 		return func(ctx *common.Context) error {
 			ip := clientIP(ctx.Request)
-			remaining, retryAfter, allowed := store.take(ip, max)
+			remaining, retryAfter, allowed := store.take(ip, limit)
 
-			ctx.Writer.Header().Set("X-RateLimit-Limit", strconv.Itoa(max))
+			ctx.Writer.Header().Set("X-RateLimit-Limit", strconv.Itoa(limit))
 			ctx.Writer.Header().Set("X-RateLimit-Remaining", strconv.Itoa(remaining))
 
 			if !allowed {
@@ -87,8 +87,8 @@ func (g *RateLimitGuard) CanActivate(ctx *common.Context) (bool, error) {
 // ── Bucket store (fixed window counter per IP) ─────────────────────────────────
 
 type bucket struct {
-	count     int
-	resetAt   time.Time
+	count   int
+	resetAt time.Time
 }
 
 type bucketStore struct {
@@ -107,7 +107,7 @@ func newBucketStore(window time.Duration) *bucketStore {
 }
 
 // take increments the counter for ip and returns (remaining, retryAfter, allowed).
-func (s *bucketStore) take(ip string, max int) (int, time.Duration, bool) {
+func (s *bucketStore) take(ip string, limit int) (int, time.Duration, bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -119,12 +119,12 @@ func (s *bucketStore) take(ip string, max int) (int, time.Duration, bool) {
 	}
 
 	b.count++
-	remaining := max - b.count
+	remaining := limit - b.count
 	if remaining < 0 {
 		remaining = 0
 	}
 
-	if b.count > max {
+	if b.count > limit {
 		return remaining, time.Until(b.resetAt), false
 	}
 	return remaining, 0, true
