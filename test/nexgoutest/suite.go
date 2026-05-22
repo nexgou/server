@@ -1,6 +1,7 @@
 package nexgoutest
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -115,7 +116,7 @@ func (b *RequestBuilder) Do(t *testing.T) *ResponseAssertion {
 		bodyReader = strings.NewReader(b.body)
 	}
 
-	req, err := http.NewRequest(b.method, url, bodyReader)
+	req, err := http.NewRequestWithContext(context.Background(), b.method, url, bodyReader)
 	if err != nil {
 		t.Fatalf("nexgoutest: failed to create request: %v", err)
 	}

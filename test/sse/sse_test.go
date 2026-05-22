@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	nexgousse "github.com/nexgou/server/src/sse"
 	"github.com/nexgou/server/src/common"
+	nexgousse "github.com/nexgou/server/src/sse"
 )
 
 // flushRecorder is an httptest.ResponseRecorder that also implements http.Flusher.
@@ -206,7 +206,7 @@ func TestSSEContext_Headers(t *testing.T) {
 
 func TestSSEContext_Done(t *testing.T) {
 	// context.Background().Done() returns a nil channel — that is valid Go stdlib
-	// behaviour for a non-cancelable context. We just verify Done() doesn't panic.
+	// behavior for a non-cancelable context. We just verify Done() doesn't panic.
 	req := httptest.NewRequest(http.MethodGet, "/sse", nil)
 	w := newFlushRecorder()
 	ctx := common.NewContext(w, req, nil)
@@ -224,7 +224,7 @@ func TestSSEContext_SendJSON_MarshalError(t *testing.T) {
 	w := newFlushRecorder()
 	ctx := common.NewContext(w, req, nil)
 	handler := nexgousse.ToHTTPHandler(func(sseCtx *nexgousse.SSEContext) error {
-		// channels cannot be marshalled to JSON
+		// channels cannot be marshaled to JSON
 		return sseCtx.SendJSON(make(chan int))
 	})
 	err := handler(ctx)

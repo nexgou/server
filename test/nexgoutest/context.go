@@ -50,13 +50,6 @@ func WithParam(key, value string) ContextOption {
 	return func(c *contextConfig) { c.params[key] = value }
 }
 
-// testResponseWriter is a minimal http.ResponseWriter that records the response.
-// It wraps httptest.ResponseRecorder so we can retrieve status/body after the handler.
-type testContext struct {
-	*common.Context
-	recorder *httptest.ResponseRecorder
-}
-
 // NewContext creates a *common.Context backed by a synthetic HTTP request,
 // suitable for unit-testing individual handlers without an HTTP server.
 //
@@ -163,7 +156,7 @@ func (a *ContextAssertion) ResponseHeader() http.Header {
 }
 
 func contains(s, sub string) bool {
-	return len(sub) == 0 || (len(s) >= len(sub) && searchString(s, sub))
+	return sub == "" || (len(s) >= len(sub) && searchString(s, sub))
 }
 
 func searchString(s, sub string) bool {
