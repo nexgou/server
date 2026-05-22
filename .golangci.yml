@@ -1,0 +1,91 @@
+# golangci-lint configuration
+# Docs: https://golangci-lint.run/usage/configuration/
+
+run:
+  timeout: 5m
+  # Analyse all packages including tests
+  tests: true
+  # Skip generated files
+  skip-files:
+    - ".*\\.pb\\.go$"
+
+output:
+  # Colored, line-by-line output
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+
+linters:
+  disable-all: true
+  enable:
+    # ── Correctness ───────────────────────────────────────────────────────────
+    - govet          # go vet checks (printf, copy locks, etc.)
+    - errcheck       # unchecked errors
+    - staticcheck    # SA family: unused, deprecated, suspicious code
+    - unused         # unused code (vars, funcs, types)
+    - ineffassign    # assignments whose value is never used
+
+    # ── Style & simplification ────────────────────────────────────────────────
+    - gosimple       # simplify Go code
+    - gofmt          # enforce gofmt formatting
+    - goimports      # enforce goimports (groups + ordering)
+    - misspell       # common English misspellings in comments/strings
+    - gocritic       # opinionated but useful suggestions
+
+    # ── Bugs ──────────────────────────────────────────────────────────────────
+    - bodyclose      # HTTP response body always closed
+    - noctx          # HTTP requests without context
+    - exportloopref  # pointers to loop variables (Go < 1.22 bug)
+
+    # ── Security ──────────────────────────────────────────────────────────────
+    - gosec          # common security issues (G-prefixed rules)
+
+linters-settings:
+  errcheck:
+    # Ignore errors returned by fmt.Print* — common in log/debug code
+    ignore: "fmt:.*"
+    check-type-assertions: false
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+    disabled-checks:
+      - commentFormatting  # too noisy for documentation-heavy code
+      - hugeParam          # false positives on framework context types
+
+  gosec:
+    excludes:
+      - G104  # errors unhandled (covered by errcheck)
+      - G304  # file path provided as taint input (samples use it intentionally)
+
+  goimports:
+    # Group imports: stdlib | external | internal
+    local-prefixes: github.com/nexgou/server
+
+  misspell:
+    locale: US
+
+issues:
+  # Maximum issues per linter (0 = unlimited)
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+  exclude-rules:
+    # Samples are demo code — relax some rules
+    - path: "samples/"
+      linters:
+        - gosec
+        - errcheck
+
+    # Test files — allow unused exported identifiers (test helpers)
+    - path: "_test\\.go$"
+      linters:
+        - unused
+        - gosec
+
+    # Allow unhandled errors on deferred Close calls in tests
+    - source: "defer.*\\.Close"
+      linters:
+        - errcheck

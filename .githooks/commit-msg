@@ -1,0 +1,51 @@
+#!/usr/bin/env sh
+# .githooks/commit-msg
+# Validates that the commit message follows the Conventional Commits spec.
+# Installed via: git config core.hooksPath .githooks
+#
+# Format:
+#   type(scope)!: short description
+#   ^-- required  ^-- optional     ^-- ! for breaking change (optional)
+#
+# Allowed types: feat fix docs style refactor perf test build ci chore revert
+
+COMMIT_MSG_FILE="$1"
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Skip merge commits, fixup!, squash!, and WIP
+case "$COMMIT_MSG" in
+  Merge\ *|Revert\ *|fixup!*|squash!*|WIP*|wip*)
+    exit 0
+    ;;
+esac
+
+PATTERN='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9/_-]+\))?!?: .{1,100}'
+
+if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
+  echo ""
+  echo "─────────────────────────────────────────────────────────────"
+  echo "  COMMIT REJECTED — message does not follow Conventional Commits"
+  echo "─────────────────────────────────────────────────────────────"
+  echo ""
+  echo "  Your message:"
+  echo "    $COMMIT_MSG"
+  echo ""
+  echo "  Expected format:"
+  echo "    type(scope): short description"
+  echo ""
+  echo "  Allowed types:"
+  echo "    feat fix docs style refactor perf test build ci chore revert"
+  echo ""
+  echo "  Examples:"
+  echo "    feat(router): add WebSocket route matching"
+  echo "    fix(middleware): handle nil context in CORS"
+  echo "    docs: update README with SSE example"
+  echo "    feat!: remove deprecated Handler() method  (breaking change)"
+  echo ""
+  echo "  Reference: https://www.conventionalcommits.org"
+  echo "─────────────────────────────────────────────────────────────"
+  echo ""
+  exit 1
+fi
+
+exit 0

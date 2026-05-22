@@ -1,0 +1,66 @@
+# ── Binaries ──────────────────────────────────────────────────────────────────
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# ── Build output ──────────────────────────────────────────────────────────────
+/dist/
+/bin/
+/out/
+
+# ── Go toolchain ──────────────────────────────────────────────────────────────
+# Test binary, built by 'go test -c'
+*.test
+
+# Output of 'go build'
+# (no pattern needed — Go binaries have no extension on Unix,
+#  covered by the samples below)
+
+# Go coverage profiles
+coverage.out
+coverage.html
+*.coverprofile
+
+# Go workspace file
+go.work
+go.work.sum
+
+# ── Dependency cache ──────────────────────────────────────────────────────────
+# Vendor directory (we rely on the module proxy)
+vendor/
+
+# ── IDE / editor ──────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# ── Secrets / env ─────────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── golangci-lint cache ───────────────────────────────────────────────────────
+.golangci-lint-cache/
+
+# ── Temp ──────────────────────────────────────────────────────────────────────
+tmp/
+temp/
+coverage
+cov.out
+cov
