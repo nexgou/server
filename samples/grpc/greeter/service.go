@@ -28,9 +28,9 @@ type HelloRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *HelloRequest) ProtoMessage()             {}
-func (x *HelloRequest) Reset()                    { *x = HelloRequest{} }
-func (x *HelloRequest) String() string            { return fmt.Sprintf("name:%q", x.Name) }
+func (x *HelloRequest) ProtoMessage()              {}
+func (x *HelloRequest) Reset()                     { *x = HelloRequest{} }
+func (x *HelloRequest) String() string             { return fmt.Sprintf("name:%q", x.Name) }
 func (x *HelloRequest) ProtoReflect() protoreflect { return nil } // simplified — not used by grpc transport
 
 // HelloReply is the response message for the SayHello and SayHelloStream RPCs.
@@ -45,9 +45,9 @@ type HelloReply struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *HelloReply) ProtoMessage()             {}
-func (x *HelloReply) Reset()                    { *x = HelloReply{} }
-func (x *HelloReply) String() string            { return fmt.Sprintf("message:%q", x.Message) }
+func (x *HelloReply) ProtoMessage()              {}
+func (x *HelloReply) Reset()                     { *x = HelloReply{} }
+func (x *HelloReply) String() string             { return fmt.Sprintf("message:%q", x.Message) }
 func (x *HelloReply) ProtoReflect() protoreflect { return nil }
 
 // ── Service descriptor ────────────────────────────────────────────────────────

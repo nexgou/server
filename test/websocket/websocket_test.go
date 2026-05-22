@@ -135,7 +135,7 @@ func TestWSRoute_Upgrade_Integration(t *testing.T) {
 // Ensure WSController interface is satisfied by a test type.
 type testWSController struct{}
 
-func (c *testWSController) Register() []common.Route      { return nil }
+func (c *testWSController) Register() []common.Route       { return nil }
 func (c *testWSController) RegisterWS() []nexgouws.WSRoute { return nil }
 
 func TestWSController_Interface(t *testing.T) {

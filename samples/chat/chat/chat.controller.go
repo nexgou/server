@@ -3,9 +3,9 @@ package chat
 import (
 	"sync"
 
-	nexgou   "github.com/nexgou/server"
-	nexgouws "github.com/nexgou/server/src/websocket"
+	nexgou "github.com/nexgou/server"
 	"github.com/nexgou/server/src/logger"
+	nexgouws "github.com/nexgou/server/src/websocket"
 )
 
 // room is a simple in-memory broadcast hub.

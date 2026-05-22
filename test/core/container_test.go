@@ -14,8 +14,8 @@ import (
 type Service struct{ Name string }
 type Repo struct{}
 
-func NewRepo() *Repo        { return &Repo{} }
-func NewService() *Service  { return &Service{Name: "svc"} }
+func NewRepo() *Repo       { return &Repo{} }
+func NewService() *Service { return &Service{Name: "svc"} }
 
 func TestContainer_RegisterAndResolve(t *testing.T) {
 	c := core.NewContainer()

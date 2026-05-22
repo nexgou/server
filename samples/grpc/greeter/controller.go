@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	nexgou "github.com/nexgou/server"
 	"google.golang.org/grpc"
+
+	nexgou "github.com/nexgou/server"
 )
 
 // GreeterController implements GreeterHandler (gRPC) and also exposes an HTTP

@@ -1,8 +1,9 @@
 package nexgougrpc
 
 import (
-	"github.com/nexgou/server/src/common"
 	"google.golang.org/grpc"
+
+	"github.com/nexgou/server/src/common"
 )
 
 // HandlerFunc is the low-level gRPC unary handler signature used internally

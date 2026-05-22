@@ -105,9 +105,9 @@ func (c *MetricsController) StreamTopic(ctx *nexgou.SSEContext) error {
 // In a real application you would read from runtime.MemStats, gopsutil, etc.
 func sampleMetrics() nexgou.H {
 	return nexgou.H{
-		"cpu":        round(20 + rand.Float64()*60),   // 20–80 %
-		"mem":        round(30 + rand.Float64()*50),   // 30–80 %
-		"goroutines": 10 + rand.Intn(90),              // 10–99
+		"cpu":        round(20 + rand.Float64()*60), // 20–80 %
+		"mem":        round(30 + rand.Float64()*50), // 30–80 %
+		"goroutines": 10 + rand.Intn(90),            // 10–99
 		"ts":         time.Now().UTC().Format(time.RFC3339),
 	}
 }
