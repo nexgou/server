@@ -2,6 +2,8 @@
 
 <br/>
 
+<img src="docs/banner.png" alt="Nexgou Banner" width="100%" />
+
 <h1>Nexgou</h1>
 
 <p><strong>Un framework Go progresivo para construir aplicaciones del lado del servidor eficientes, escalables y mantenibles.</strong></p>
