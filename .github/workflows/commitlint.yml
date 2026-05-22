@@ -1,0 +1,95 @@
+name: Conventional Commits
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+
+permissions:
+  pull-requests: read
+
+jobs:
+  # ── PR title ─────────────────────────────────────────────────────────────────
+  # Validates that the PR title follows the Conventional Commits specification.
+  # When PRs are squash-merged, the PR title becomes the squash commit message,
+  # so it is the most important thing to validate.
+  pr-title:
+    name: PR title
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Allowed types (aligned with release-please's default config)
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+          # Allowed scopes (optional — remove to allow any scope)
+          # scopes: |
+          #   core
+          #   router
+          #   middleware
+          #   websocket
+          #   sse
+          #   config
+          #   logger
+          #   test
+          #   samples
+          #   docs
+          #   ci
+          requireScope: false
+          # Breaking changes: allow ! suffix (feat!: ...) and BREAKING CHANGE footer
+          validateSingleCommit: false
+
+  # ── Commit messages in the PR ─────────────────────────────────────────────────
+  # When PRs are merged with the "Create a merge commit" strategy, each individual
+  # commit message also needs to follow the spec.
+  commit-messages:
+    name: Commit messages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate commit messages
+        run: |
+          # Pattern: type(scope)!: description  OR  type!: description
+          PATTERN='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9/_-]+\))?!?: .{1,100}$'
+          FAILED=0
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+
+          while IFS= read -r msg; do
+            # Skip merge commits
+            if echo "$msg" | grep -q "^Merge "; then
+              continue
+            fi
+            if ! echo "$msg" | grep -qE "$PATTERN"; then
+              echo "FAIL: \"$msg\""
+              echo "      Expected format: type(scope): description"
+              echo "      Example: feat(router): add WebSocket route matching"
+              FAILED=1
+            fi
+          done < <(git log --format="%s" "$BASE..$HEAD")
+
+          if [ "$FAILED" -eq 1 ]; then
+            echo ""
+            echo "One or more commit messages do not follow Conventional Commits."
+            echo "See https://www.conventionalcommits.org for the specification."
+            exit 1
+          fi
+          echo "All commit messages are valid."
