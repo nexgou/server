@@ -3,15 +3,11 @@
 
 run:
   timeout: 5m
-  # Analyse all packages including tests
   tests: true
-  # Skip generated files
-  skip-files:
-    - ".*\\.pb\\.go$"
 
 output:
-  # Colored, line-by-line output
-  format: colored-line-number
+  formats:
+    - format: colored-line-number
   print-issued-lines: true
   print-linter-name: true
 
@@ -35,15 +31,19 @@ linters:
     # ── Bugs ──────────────────────────────────────────────────────────────────
     - bodyclose      # HTTP response body always closed
     - noctx          # HTTP requests without context
-    - exportloopref  # pointers to loop variables (Go < 1.22 bug)
+    - copyloopvar    # pointers to loop variables
 
     # ── Security ──────────────────────────────────────────────────────────────
     - gosec          # common security issues (G-prefixed rules)
 
 linters-settings:
   errcheck:
-    # Ignore errors returned by fmt.Print* — common in log/debug code
-    ignore: "fmt:.*"
+    exclude-functions:
+      - fmt.Print
+      - fmt.Println
+      - fmt.Printf
+      - fmt.Fprintf
+      - fmt.Fprintln
     check-type-assertions: false
 
   gocritic:
@@ -54,23 +54,26 @@ linters-settings:
     disabled-checks:
       - commentFormatting  # too noisy for documentation-heavy code
       - hugeParam          # false positives on framework context types
+      - httpNoBody         # nil body is valid and idiomatic in tests
 
   gosec:
     excludes:
       - G104  # errors unhandled (covered by errcheck)
       - G304  # file path provided as taint input (samples use it intentionally)
+      - G114  # use of net/http serve without timeout (handled via nolint in bootstrap)
 
   goimports:
-    # Group imports: stdlib | external | internal
     local-prefixes: github.com/nexgou/server
 
   misspell:
     locale: US
 
 issues:
-  # Maximum issues per linter (0 = unlimited)
   max-issues-per-linter: 0
   max-same-issues: 0
+
+  exclude-files:
+    - ".*\\.pb\\.go$"
 
   exclude-rules:
     # Samples are demo code — relax some rules
@@ -78,6 +81,7 @@ issues:
       linters:
         - gosec
         - errcheck
+        - unused
 
     # Test files — allow unused exported identifiers (test helpers)
     - path: "_test\\.go$"
