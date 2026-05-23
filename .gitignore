@@ -58,6 +58,11 @@ ehthumbs.db
 # ── golangci-lint cache ───────────────────────────────────────────────────────
 .golangci-lint-cache/
 
+# ── SQLite databases (runtime-generated) ─────────────────────────────────────
+*.db
+*.db-shm
+*.db-wal
+
 # ── Temp ──────────────────────────────────────────────────────────────────────
 tmp/
 temp/
