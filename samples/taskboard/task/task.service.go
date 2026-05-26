@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	nexgou "github.com/nexgou/server"
 	"github.com/nexgou/server/src/logger"
 	"github.com/nexgou/server/src/module/database"
 	"github.com/nexgou/server/src/module/events"
@@ -23,6 +24,17 @@ type TaskService struct {
 	db     *database.DatabaseService
 	events *events.EventEmitter
 	log    *logger.ScopedLogger
+}
+
+// Service is a lightweight task service backed by Store for sample tests.
+type Service struct {
+	store *Store
+	log   *nexgou.ScopedLogger
+}
+
+// NewService creates a Store-backed task service.
+func NewService(store *Store, log *nexgou.LoggerService) *Service {
+	return &Service{store: store, log: log.WithContext("TaskService")}
 }
 
 // NewTaskService creates a new TaskService and runs migrations.
@@ -158,4 +170,32 @@ func (s *TaskService) DeleteCompleted() (int64, error) {
 func idToInt64(id string) int64 {
 	n, _ := strconv.ParseInt(id, 10, 64)
 	return n
+}
+
+func (s *Service) FindAll(userID string) ([]Task, error) {
+	return s.store.List(context.Background(), userID)
+}
+
+func (s *Service) Create(title, userID string) (*Task, error) {
+	task, err := s.store.Insert(context.Background(), title, userID)
+	if err == nil {
+		s.log.Info("task created", "id", task.ID, "title", title)
+	}
+	return task, err
+}
+
+func (s *Service) Complete(id string) (*Task, error) {
+	task, err := s.store.Complete(context.Background(), id)
+	if err == nil {
+		s.log.Info("task completed", "id", id)
+	}
+	return task, err
+}
+
+func (s *Service) Delete(id string) error {
+	err := s.store.Delete(context.Background(), id)
+	if err == nil {
+		s.log.Info("task deleted", "id", id)
+	}
+	return err
 }

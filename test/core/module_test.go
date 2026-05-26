@@ -38,6 +38,8 @@ func TestModulePackageNewReturnsOptions(t *testing.T) {
 
 type testController struct{}
 
+type repository struct{}
+
 func (controller *testController) Register() []common.Route {
 	return nil
 }
