@@ -6,25 +6,26 @@ import (
 	"strings"
 
 	"github.com/nexgou/server/src/common"
-	nexgouws "github.com/nexgou/server/src/websocket"
 )
 
 type entry struct {
-	method       string
-	segments     []string
-	handler      common.HandlerFunc
-	guards       []common.Guard
-	interceptors []common.Interceptor
-	version      string
+	method          string
+	segments        []string
+	handler         common.HandlerFunc
+	compiledHandler common.HandlerFunc
+	guards          []common.Guard
+	interceptors    []common.Interceptor
+	version         string
+	hasParams       bool
 }
 
-// Router handles HTTP routing with support for parameterized path segments (:param),
-// and WebSocket routing via AddWS.
+// Router handles HTTP routing with support for parameterized path segments (:param).
 type Router struct {
-	entries     []entry
-	wsEntries   []nexgouws.WSEntry
-	middlewares []common.MiddlewareFunc
-	filter      common.ExceptionFilter
+	entries        []entry
+	staticRoutes   map[string]map[string]int
+	dynamicEntries []int
+	middlewares    []common.MiddlewareFunc
+	filter         common.ExceptionFilter
 }
 
 // New creates a new Router.
@@ -41,32 +42,25 @@ func (r *Router) Add(route common.Route) {
 		path = "/" + v + path
 	}
 	segments := splitPath(path)
-	for i, e := range r.entries {
-		if e.method == route.Method && segmentsEqual(e.segments, segments) {
-			r.entries[i] = entry{
-				method:       route.Method,
-				segments:     segments,
-				handler:      route.Handler,
-				guards:       route.Guards,
-				interceptors: route.Interceptors,
-				version:      route.Ver(),
-			}
-			return
-		}
-	}
-	r.entries = append(r.entries, entry{
+	newEntry := entry{
 		method:       route.Method,
 		segments:     segments,
 		handler:      route.Handler,
 		guards:       route.Guards,
 		interceptors: route.Interceptors,
 		version:      route.Ver(),
-	})
-}
-
-// AddWS registers a WebSocket route.
-func (r *Router) AddWS(route nexgouws.WSRoute) {
-	r.wsEntries = append(r.wsEntries, nexgouws.NewEntry(route))
+		hasParams:    hasParamSegment(segments),
+	}
+	newEntry.compiledHandler = r.compileHandler(newEntry)
+	for i, e := range r.entries {
+		if e.method == route.Method && segmentsEqual(e.segments, segments) {
+			r.entries[i] = newEntry
+			r.rebuildIndexes()
+			return
+		}
+	}
+	r.entries = append(r.entries, newEntry)
+	r.rebuildIndexes()
 }
 
 // RouteInfo holds the public metadata of a registered HTTP route.
@@ -76,13 +70,6 @@ type RouteInfo struct {
 	Guards       []string
 	Interceptors []string
 	Version      string
-}
-
-// WSRouteInfo holds the public metadata of a registered WebSocket route.
-type WSRouteInfo struct {
-	Path    string
-	Guards  []string
-	Version string
 }
 
 // Routes returns a snapshot of all registered HTTP routes in registration order.
@@ -95,19 +82,6 @@ func (r *Router) Routes() []RouteInfo {
 			Guards:       typeNames(e.guards),
 			Interceptors: typeNames(e.interceptors),
 			Version:      e.version,
-		}
-	}
-	return out
-}
-
-// WSRoutes returns a snapshot of all registered WebSocket routes.
-func (r *Router) WSRoutes() []WSRouteInfo {
-	out := make([]WSRouteInfo, len(r.wsEntries))
-	for i, e := range r.wsEntries {
-		out[i] = WSRouteInfo{
-			Path:    e.Route.FullPath(),
-			Guards:  typeNames(e.Route.Guards),
-			Version: e.Route.Ver(),
 		}
 	}
 	return out
@@ -130,6 +104,9 @@ func typeNames[T any](items []T) []string {
 // First registered middleware is the outermost wrapper.
 func (r *Router) Use(mw common.MiddlewareFunc) {
 	r.middlewares = append(r.middlewares, mw)
+	for i := range r.entries {
+		r.entries[i].compiledHandler = r.compileHandler(r.entries[i])
+	}
 }
 
 // SetFilter sets the global exception filter used to handle handler errors.
@@ -137,92 +114,133 @@ func (r *Router) SetFilter(f common.ExceptionFilter) {
 	r.filter = f
 }
 
-// ServeHTTP implements http.Handler. It first attempts to match WebSocket
-// upgrade requests, then falls through to the regular HTTP route table.
+// ServeHTTP implements http.Handler.
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	reqSegments := splitPath(req.URL.Path)
-	params := make(map[string]string)
+	var matched *entry
+	var params map[string]string
 
-	// ── WebSocket upgrade ──────────────────────────────────────────────────────
-	if isWebSocketUpgrade(req) {
-		for _, e := range r.wsEntries {
-			if e.Match(reqSegments, params) {
-				ctx := common.NewContext(w, req, params)
-
-				// Run guards before the upgrade — denial responds with HTTP 403.
-				for _, g := range e.Route.Guards {
-					ok, err := g.CanActivate(ctx)
-					if err != nil {
-						r.handleError(err, ctx, w)
-						return
-					}
-					if !ok {
-						r.handleError(common.NewForbiddenException("Forbidden"), ctx, w)
-						return
-					}
-				}
-
-				// Guards passed — perform the upgrade.
-				e.Route.Upgrade(w, req, params)
-				return
+	if r.staticRoutes != nil {
+		methodRoutes := r.staticRoutes[req.Method]
+		if index, ok := methodRoutes[req.URL.Path]; ok {
+			matched = &r.entries[index]
+		}
+	} else {
+		reqSegments := splitPath(req.URL.Path)
+		for index := range r.entries {
+			e := &r.entries[index]
+			if e.method != req.Method {
+				continue
 			}
-			// Clear params before trying the next WS entry.
-			for k := range params {
-				delete(params, k)
+			matchedParams, ok := match(e.segments, reqSegments, e.hasParams)
+			if ok {
+				matched = e
+				params = matchedParams
+				break
 			}
 		}
 	}
 
-	// ── HTTP routes ────────────────────────────────────────────────────────────
-	for _, e := range r.entries {
-		if e.method != req.Method {
-			continue
+	if matched == nil && len(r.dynamicEntries) == 0 && !strings.HasSuffix(req.URL.Path, "/") {
+		r.writeNotFound(w, req)
+		return
+	}
+
+	if matched == nil && r.staticRoutes != nil {
+		reqSegments := splitPath(req.URL.Path)
+
+		// ── HTTP routes ────────────────────────────────────────────────────────────
+		for _, index := range r.dynamicEntries {
+			e := &r.entries[index]
+			if e.method != req.Method {
+				continue
+			}
+			matchedParams, ok := match(e.segments, reqSegments, e.hasParams)
+			if ok {
+				matched = e
+				params = matchedParams
+				break
+			}
 		}
-		if match(e.segments, reqSegments, params) {
-			ctx := common.NewContext(w, req, params)
 
-			// Run guards — any denial short-circuits the request.
-			for _, g := range e.guards {
-				ok, err := g.CanActivate(ctx)
-				if err != nil {
-					r.handleError(err, ctx, w)
-					return
+		if matched == nil && strings.HasSuffix(req.URL.Path, "/") {
+			for index := range r.entries {
+				e := &r.entries[index]
+				if e.hasParams || e.method != req.Method {
+					continue
 				}
-				if !ok {
-					r.handleError(common.NewForbiddenException("Forbidden"), ctx, w)
-					return
+				if _, ok := match(e.segments, reqSegments, false); ok {
+					matched = e
+					break
 				}
 			}
+		}
+	}
 
-			// Build the final handler wrapped by interceptors (innermost first).
-			handler := e.handler
-			for i := len(e.interceptors) - 1; i >= 0; i-- {
-				ic := e.interceptors[i]
-				next := handler
-				handler = func(c *common.Context) error {
-					return ic.Intercept(c, next)
-				}
-			}
+	if matched == nil {
+		r.writeNotFound(w, req)
+		return
+	}
 
-			// Wrap with global middleware chain (last registered = innermost).
-			for i := len(r.middlewares) - 1; i >= 0; i-- {
-				handler = r.middlewares[i](handler)
-			}
+	ctx := common.NewContext(w, req, params)
 
-			if err := handler(ctx); err != nil {
-				r.handleError(err, ctx, w)
-			}
+	// Run guards — any denial short-circuits the request.
+	for _, g := range matched.guards {
+		ok, err := g.CanActivate(ctx)
+		if err != nil {
+			r.handleError(err, ctx, w)
 			return
 		}
-		// Clear params before trying the next route.
-		for k := range params {
-			delete(params, k)
+		if !ok {
+			r.handleError(common.NewForbiddenException("Forbidden"), ctx, w)
+			return
 		}
 	}
 
+	if err := matched.compiledHandler(ctx); err != nil {
+		r.handleError(err, ctx, w)
+	}
+}
+
+func (r *Router) writeNotFound(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNotFound)
 	_, _ = w.Write([]byte(`{"statusCode":404,"message":"Cannot ` + req.Method + ` ` + req.URL.Path + `"}`))
+}
+
+func (r *Router) rebuildIndexes() {
+	r.staticRoutes = nil
+	r.dynamicEntries = r.dynamicEntries[:0]
+	for index, e := range r.entries {
+		if e.hasParams {
+			r.dynamicEntries = append(r.dynamicEntries, index)
+			continue
+		}
+		if r.staticRoutes == nil {
+			r.staticRoutes = make(map[string]map[string]int)
+		}
+		methodRoutes := r.staticRoutes[e.method]
+		if methodRoutes == nil {
+			methodRoutes = make(map[string]int)
+			r.staticRoutes[e.method] = methodRoutes
+		}
+		methodRoutes[entryPath(e.segments)] = index
+	}
+}
+
+func (r *Router) compileHandler(e entry) common.HandlerFunc {
+	handler := e.handler
+	for i := len(e.interceptors) - 1; i >= 0; i-- {
+		ic := e.interceptors[i]
+		next := handler
+		handler = func(c *common.Context) error {
+			return ic.Intercept(c, next)
+		}
+	}
+
+	for i := len(r.middlewares) - 1; i >= 0; i-- {
+		handler = r.middlewares[i](handler)
+	}
+	return handler
 }
 
 // handleError dispatches an error to the exception filter or falls back to plain HTTP errors.
@@ -236,25 +254,41 @@ func (r *Router) handleError(err error, ctx *common.Context, w http.ResponseWrit
 	}
 }
 
-// isWebSocketUpgrade reports whether the request is a WebSocket upgrade.
-func isWebSocketUpgrade(r *http.Request) bool {
-	return strings.EqualFold(r.Header.Get("Upgrade"), "websocket") &&
-		strings.Contains(strings.ToLower(r.Header.Get("Connection")), "upgrade")
-}
-
 // match checks whether a path matches a pattern and populates params.
-func match(pattern, path []string, params map[string]string) bool {
+func match(pattern, path []string, captureParams bool) (map[string]string, bool) {
 	if len(pattern) != len(path) {
-		return false
+		return nil, false
 	}
+	var params map[string]string
 	for i, seg := range pattern {
 		if strings.HasPrefix(seg, ":") {
-			params[seg[1:]] = path[i]
+			if captureParams && params == nil {
+				params = make(map[string]string)
+			}
+			if params != nil {
+				params[seg[1:]] = path[i]
+			}
 		} else if seg != path[i] {
-			return false
+			return nil, false
 		}
 	}
-	return true
+	return params, true
+}
+
+func hasParamSegment(segments []string) bool {
+	for _, seg := range segments {
+		if strings.HasPrefix(seg, ":") {
+			return true
+		}
+	}
+	return false
+}
+
+func entryPath(segments []string) string {
+	if len(segments) == 0 {
+		return "/"
+	}
+	return "/" + strings.Join(segments, "/")
 }
 
 // splitPath splits a URL path into clean segments, stripping leading/trailing slashes.

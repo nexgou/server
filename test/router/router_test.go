@@ -229,7 +229,7 @@ func TestRouter_ExceptionFilter(t *testing.T) {
 	}
 }
 
-// ── Routes/WSRoutes metadata ──────────────────────────────────────────────────
+// ── Routes metadata ───────────────────────────────────────────────────────────
 
 func TestRouter_RoutesMetadata(t *testing.T) {
 	r := router.New()
@@ -242,13 +242,6 @@ func TestRouter_RoutesMetadata(t *testing.T) {
 	}
 	if routes[0].Method != http.MethodGet {
 		t.Errorf("Routes[0].Method: got %q, want GET", routes[0].Method)
-	}
-}
-
-func TestRouter_WSRoutes_Empty(t *testing.T) {
-	r := router.New()
-	if got := r.WSRoutes(); len(got) != 0 {
-		t.Errorf("WSRoutes empty: got %d", len(got))
 	}
 }
 

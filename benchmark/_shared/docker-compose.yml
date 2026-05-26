@@ -1,0 +1,158 @@
+services:
+  nexgou:
+    build:
+      context: ../..
+      dockerfile: benchmark/nexgou/Dockerfile
+    container_name: bench-nexgou
+    environment:
+      PORT: 3001
+      DB_PATH: /app/data/db.sqlite
+      SERVICE_NAME: nexgou
+      SERVICE_VERSION: 2.0.0
+      LOG_LEVEL: silent
+    volumes:
+      - nexgou_data:/app/data
+    ports:
+      - "3001:3001"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+
+  fastify:
+    build:
+      context: ../fastify
+      dockerfile: Dockerfile
+    container_name: bench-fastify
+    environment:
+      PORT: 3002
+      DB_PATH: /app/data/db.sqlite
+      SERVICE_NAME: fastify
+      SERVICE_VERSION: 2.0.0
+      LOG_LEVEL: silent
+    volumes:
+      - fastify_data:/app/data
+    ports:
+      - "3002:3002"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+
+  asp-kestrel:
+    build:
+      context: ../asp-kestrel
+      dockerfile: Dockerfile
+    container_name: bench-asp-kestrel
+    environment:
+      PORT: 3003
+      DB_PATH: /app/data/db.sqlite
+      SERVICE_NAME: asp-kestrel
+      SERVICE_VERSION: 2.0.0
+      LOG_LEVEL: silent
+      ASPNETCORE_URLS: http://+:3003
+    volumes:
+      - asp_kestrel_data:/app/data
+    ports:
+      - "3003:3003"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+
+  actix-web:
+    build:
+      context: ../actix-web
+      dockerfile: Dockerfile
+    container_name: bench-actix-web
+    environment:
+      PORT: 3004
+      DB_PATH: /app/data/db.sqlite
+      SERVICE_NAME: actix-web
+      SERVICE_VERSION: 2.0.0
+      LOG_LEVEL: silent
+    volumes:
+      - actix_web_data:/app/data
+    ports:
+      - "3004:3004"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+
+  hyper:
+    build:
+      context: ../hyper
+      dockerfile: Dockerfile
+    container_name: bench-hyper
+    environment:
+      PORT: 3005
+      DB_PATH: /app/data/db.sqlite
+      SERVICE_NAME: hyper
+      SERVICE_VERSION: 2.0.0
+      LOG_LEVEL: silent
+    volumes:
+      - hyper_data:/app/data
+    ports:
+      - "3005:3005"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+
+  vert-x:
+    build:
+      context: ../vert-x
+      dockerfile: Dockerfile
+    container_name: bench-vert-x
+    environment:
+      PORT: 3006
+      DB_PATH: /app/data/db.sqlite
+      SERVICE_NAME: vert-x
+      SERVICE_VERSION: 2.0.0
+      LOG_LEVEL: silent
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=75 -XX:InitialRAMPercentage=25
+    volumes:
+      - vert_x_data:/app/data
+    ports:
+      - "3006:3006"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+
+  ajax-php:
+    build:
+      context: ../ajax-php
+      dockerfile: Dockerfile
+    container_name: bench-ajax-php
+    environment:
+      PORT: 3007
+      DB_PATH: /app/data/db.sqlite
+      SERVICE_NAME: ajax-php
+      SERVICE_VERSION: 2.0.0
+      LOG_LEVEL: silent
+    volumes:
+      - ajax_php_data:/app/data
+    ports:
+      - "3007:3007"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+
+volumes:
+  nexgou_data:
+  fastify_data:
+  asp_kestrel_data:
+  actix_web_data:
+  hyper_data:
+  vert_x_data:
+  ajax_php_data:

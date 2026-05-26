@@ -14,9 +14,6 @@
 - [Interceptores](#interceptores)
 - [Pipes](#pipes)
 - [Filtros de excepción](#filtros-de-excepción)
-- [Controladores WebSocket](#controladores-websocket)
-- [Controladores gRPC](#controladores-grpc)
-- [Combinar transportes](#combinar-transportes)
 
 ---
 
@@ -59,13 +56,13 @@ var ProductModule = nexgou.Module(nexgou.ModuleOptions{
 
 Todos los helpers de rutas devuelven un `nexgou.Route` que admite encadenamiento fluido.
 
-| Función | Método HTTP | Ejemplo |
-|:---|:---|:---|
-| `nexgou.Get(path, handler)` | GET | `nexgou.Get("/users", c.List)` |
-| `nexgou.Post(path, handler)` | POST | `nexgou.Post("/users", c.Create)` |
-| `nexgou.Put(path, handler)` | PUT | `nexgou.Put("/users/:id", c.Replace)` |
-| `nexgou.Patch(path, handler)` | PATCH | `nexgou.Patch("/users/:id", c.Update)` |
-| `nexgou.Delete(path, handler)` | DELETE | `nexgou.Delete("/users/:id", c.Remove)` |
+| Función                        | Método HTTP | Ejemplo                                 |
+| :----------------------------- | :---------- | :-------------------------------------- |
+| `nexgou.Get(path, handler)`    | GET         | `nexgou.Get("/users", c.List)`          |
+| `nexgou.Post(path, handler)`   | POST        | `nexgou.Post("/users", c.Create)`       |
+| `nexgou.Put(path, handler)`    | PUT         | `nexgou.Put("/users/:id", c.Replace)`   |
+| `nexgou.Patch(path, handler)`  | PATCH       | `nexgou.Patch("/users/:id", c.Update)`  |
+| `nexgou.Delete(path, handler)` | DELETE      | `nexgou.Delete("/users/:id", c.Remove)` |
 
 ### Parámetros de URL
 
@@ -129,15 +126,15 @@ return nexgou.Exception(422, "Entidad no procesable")
 
 ### API completa de Context
 
-| Método | Firma | Descripción |
-|:---|:---|:---|
-| `Method` | `() string` | Verbo HTTP |
-| `Path` | `() string` | Ruta URL |
-| `Param` | `(key string) string` | Parámetro URL con nombre |
-| `Params` | `() map[string]string` | Todos los parámetros URL (copia) |
-| `Header` | `(key string) string` | Valor de cabecera de la solicitud |
-| `Body` | `(target any) error` | Decodificar JSON del cuerpo de la solicitud en `target` |
-| `JSON` | `(status int, data any) error` | Escribir respuesta JSON |
+| Método   | Firma                          | Descripción                                             |
+| :------- | :----------------------------- | :------------------------------------------------------ |
+| `Method` | `() string`                    | Verbo HTTP                                              |
+| `Path`   | `() string`                    | Ruta URL                                                |
+| `Param`  | `(key string) string`          | Parámetro URL con nombre                                |
+| `Params` | `() map[string]string`         | Todos los parámetros URL (copia)                        |
+| `Header` | `(key string) string`          | Valor de cabecera de la solicitud                       |
+| `Body`   | `(target any) error`           | Decodificar JSON del cuerpo de la solicitud en `target` |
+| `JSON`   | `(status int, data any) error` | Escribir respuesta JSON                                 |
 
 ---
 
@@ -225,15 +222,16 @@ nexgou.Post("/uploads", c.Upload).
 ```
 
 Los múltiples interceptores forman una cadena anidada:
+
 ```
 interceptor1.antes → interceptor2.antes → handler → interceptor2.después → interceptor1.después
 ```
 
 ### Interceptores incorporados
 
-| Interceptor | Paquete | Descripción |
-|:---|:---|:---|
-| `TimeoutInterceptor` | `src/middleware` | Deadline de solicitud por ruta |
+| Interceptor            | Paquete          | Descripción                         |
+| :--------------------- | :--------------- | :---------------------------------- |
+| `TimeoutInterceptor`   | `src/middleware` | Deadline de solicitud por ruta      |
 | `BodyLimitInterceptor` | `src/middleware` | Límite de tamaño de cuerpo por ruta |
 
 Ver [Seguridad](security.md) para más detalles.
@@ -265,11 +263,11 @@ func (c *Controller) GetUser(ctx *nexgou.Context) error {
 
 ### Pipes incorporados
 
-| Pipe | Descripción | Devuelve |
-|:---|:---|:---|
-| `ParseIntPipe` | Valida y parsea string como `int` | `int` o error 400 |
-| `ParseUUIDPipe` | Valida que el string tenga formato UUID de 36 caracteres | `string` o error 400 |
-| `DefaultValuePipe{Default: "..."}` | Devuelve el fallback cuando la entrada está vacía | `string` |
+| Pipe                               | Descripción                                              | Devuelve             |
+| :--------------------------------- | :------------------------------------------------------- | :------------------- |
+| `ParseIntPipe`                     | Valida y parsea string como `int`                        | `int` o error 400    |
+| `ParseUUIDPipe`                    | Valida que el string tenga formato UUID de 36 caracteres | `string` o error 400 |
+| `DefaultValuePipe{Default: "..."}` | Devuelve el fallback cuando la entrada está vacía        | `string`             |
 
 ### Pipe personalizado
 
@@ -328,94 +326,4 @@ func (f *AppExceptionFilter) Catch(err error, ctx *nexgou.Context) error {
 }
 
 app.SetFilter(&AppExceptionFilter{})
-```
-
----
-
-## Controladores WebSocket
-
-Un controlador WebSocket implementa `RegisterWS()` en lugar de (o junto a) `Register()`.
-
-```go
-type ChatController struct{}
-
-func (c *ChatController) Register() []nexgou.Route {
-    return nil // sin rutas HTTP
-}
-
-func (c *ChatController) RegisterWS() []nexgou.WSRoute {
-    return []nexgou.WSRoute{
-        nexgou.WS("/chat/echo", c.Echo),
-    }
-}
-
-func (c *ChatController) Echo(ctx *nexgou.WSContext) error {
-    for {
-        msg, err := ctx.Receive()
-        if err != nil {
-            return nil // cliente desconectado
-        }
-        if err := ctx.Send(msg); err != nil {
-            return err
-        }
-    }
-}
-```
-
-Ver [WebSocket](websocket.md) para la guía completa.
-
----
-
-## Controladores gRPC
-
-Un controlador gRPC implementa `RegisterGRPC()`:
-
-```go
-func (c *GreeterController) RegisterGRPC() []nexgou.GRPCRoute {
-    return []nexgou.GRPCRoute{
-        nexgou.GRPC(Greeter_ServiceDesc, c).Guard(&AuthGuard{}),
-    }
-}
-```
-
-Ver [gRPC](grpc.md) para la guía completa, incluyendo descriptores de servicio y streaming.
-
----
-
-## Combinar transportes
-
-Un solo controlador puede implementar las tres interfaces de transporte simultáneamente. El framework detecta qué interfaces están implementadas y registra las rutas en consecuencia.
-
-```go
-type GreeterController struct{ svc *GreeterService }
-
-// HTTP
-func (c *GreeterController) Register() []nexgou.Route {
-    return []nexgou.Route{
-        nexgou.Get("/health", c.Health),
-    }
-}
-
-// WebSocket
-func (c *GreeterController) RegisterWS() []nexgou.WSRoute {
-    return []nexgou.WSRoute{
-        nexgou.WS("/greet/live", c.LiveGreet),
-    }
-}
-
-// gRPC
-func (c *GreeterController) RegisterGRPC() []nexgou.GRPCRoute {
-    return []nexgou.GRPCRoute{
-        nexgou.GRPC(Greeter_ServiceDesc, c),
-    }
-}
-```
-
-Los tres se registran desde la misma entrada del módulo:
-
-```go
-var GreeterModule = nexgou.Module(nexgou.ModuleOptions{
-    Controllers: []any{NewGreeterController},
-    Providers:   []any{NewGreeterService},
-})
 ```

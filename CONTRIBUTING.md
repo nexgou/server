@@ -26,9 +26,9 @@ Thank you for your interest in contributing to Nexgou. Contributions of all kind
 ## Prerequisites
 
 | Tool | Minimum version |
-|------|----------------|
-| Go | 1.21 |
-| Git | 2.34 |
+| ---- | --------------- |
+| Go   | 1.21            |
+| Git  | 2.34            |
 
 ---
 
@@ -38,7 +38,7 @@ Thank you for your interest in contributing to Nexgou. Contributions of all kind
 .
 ├── nexgou.go              # Public API — re-exports from src/
 ├── src/                   # Internal packages
-│   ├── app/               # App bootstrap (CreateApp, Listen, ListenGRPC)
+│   ├── app/               # App bootstrap (CreateApp, Listen)
 │   ├── common/            # Shared types (Context, Route, exceptions, …)
 │   ├── core/              # IoC container + Module system
 │   ├── router/            # HTTP router
@@ -48,16 +48,11 @@ Thank you for your interest in contributing to Nexgou. Contributions of all kind
 │   ├── filter/            # Exception filters
 │   ├── pipe/              # Pipes (ParseInt, ParseUUID, …)
 │   ├── config/            # ConfigService
-│   ├── logger/            # LoggerService
-│   ├── websocket/         # WebSocket support
-│   ├── sse/               # Server-Sent Events support
-│   └── grpc/              # gRPC support
+│   └── logger/            # LoggerService
 ├── test/                  # All tests (mirrors src/ structure)
 ├── samples/               # Runnable example applications
-│   ├── api/               # REST + WebSocket + SSE sample
-│   ├── chat/              # WebSocket chat sample
-│   ├── sse/               # SSE metrics sample
-│   └── grpc/              # gRPC greeter sample
+│   ├── api/               # REST API sample
+│   └── taskboard/         # Task board HTTP sample
 └── docs/                  # Extended documentation
 ```
 
@@ -77,11 +72,13 @@ cd server
 The repository includes commit-message hooks that enforce Conventional Commits locally before you push.
 
 **Linux / macOS:**
+
 ```bash
 ./scripts/install-hooks.sh
 ```
 
 **Windows (PowerShell):**
+
 ```powershell
 ./scripts/install-hooks.ps1
 ```
@@ -105,11 +102,11 @@ go test ./test/...
 
 1. **Open an issue** — describe the bug or feature you want to work on. This avoids duplicate work and lets us align on the approach before you invest time.
 2. **Create a branch** from `main`:
-   ```bash
-   git checkout -b feat/my-feature
-   # or
-   git checkout -b fix/the-bug
-   ```
+    ```bash
+    git checkout -b feat/my-feature
+    # or
+    git checkout -b fix/the-bug
+    ```
 3. **Make your changes** and add tests in `test/<package>/`.
 4. **Run the full suite** locally (see [Running Tests](#running-tests)).
 5. **Commit** following the [Commit Conventions](#commit-conventions).
@@ -162,28 +159,27 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/). 
 
 ### Allowed types
 
-| Type | When to use |
-|------|------------|
-| `feat` | A new feature |
-| `fix` | A bug fix |
-| `docs` | Documentation changes only |
+| Type       | When to use                                             |
+| ---------- | ------------------------------------------------------- |
+| `feat`     | A new feature                                           |
+| `fix`      | A bug fix                                               |
+| `docs`     | Documentation changes only                              |
 | `refactor` | Code change that neither fixes a bug nor adds a feature |
-| `perf` | Performance improvement |
-| `test` | Adding or updating tests |
-| `build` | Build system or dependency changes |
-| `ci` | CI configuration changes |
-| `chore` | Maintenance (updating go.sum, tooling, …) |
-| `revert` | Reverts a previous commit |
-| `style` | Formatting, missing semicolons, etc. |
+| `perf`     | Performance improvement                                 |
+| `test`     | Adding or updating tests                                |
+| `build`    | Build system or dependency changes                      |
+| `ci`       | CI configuration changes                                |
+| `chore`    | Maintenance (updating go.sum, tooling, …)               |
+| `revert`   | Reverts a previous commit                               |
+| `style`    | Formatting, missing semicolons, etc.                    |
 
 ### Examples
 
 ```
-feat(grpc): add server-streaming RPC support
 fix(router): resolve param extraction on trailing slashes
-docs(sse): add reconnect example to README
+docs(router): add route versioning example to README
 test(middleware): add race-condition test for rate limiter
-feat!: rename ListenGRPC to StartGRPC
+feat!: rename route versioning option
 ```
 
 For **breaking changes**, append `!` after the type/scope or add a `BREAKING CHANGE:` footer.
@@ -243,9 +239,9 @@ Gracias por tu interés en contribuir a Nexgou. Son bienvenidas contribuciones d
 ## Requisitos previos
 
 | Herramienta | Versión mínima |
-|-------------|---------------|
-| Go | 1.21 |
-| Git | 2.34 |
+| ----------- | -------------- |
+| Go          | 1.21           |
+| Git         | 2.34           |
 
 ---
 
@@ -255,7 +251,7 @@ Gracias por tu interés en contribuir a Nexgou. Son bienvenidas contribuciones d
 .
 ├── nexgou.go              # API pública — re-exporta desde src/
 ├── src/                   # Paquetes internos
-│   ├── app/               # Bootstrap (CreateApp, Listen, ListenGRPC)
+│   ├── app/               # Bootstrap (CreateApp, Listen)
 │   ├── common/            # Tipos compartidos (Context, Route, exceptions, …)
 │   ├── core/              # Contenedor IoC + sistema de módulos
 │   ├── router/            # Router HTTP
@@ -265,16 +261,11 @@ Gracias por tu interés en contribuir a Nexgou. Son bienvenidas contribuciones d
 │   ├── filter/            # Filtros de excepciones
 │   ├── pipe/              # Pipes (ParseInt, ParseUUID, …)
 │   ├── config/            # ConfigService
-│   ├── logger/            # LoggerService
-│   ├── websocket/         # Soporte WebSocket
-│   ├── sse/               # Soporte Server-Sent Events
-│   └── grpc/              # Soporte gRPC
+│   └── logger/            # LoggerService
 ├── test/                  # Todos los tests (espeja la estructura de src/)
 ├── samples/               # Aplicaciones de ejemplo ejecutables
-│   ├── api/               # Ejemplo REST + WebSocket + SSE
-│   ├── chat/              # Ejemplo chat WebSocket
-│   ├── sse/               # Ejemplo métricas SSE
-│   └── grpc/              # Ejemplo gRPC greeter
+│   ├── api/               # Ejemplo REST API
+│   └── taskboard/         # Ejemplo HTTP de tablero de tareas
 └── docs/                  # Documentación extendida
 ```
 
@@ -294,11 +285,13 @@ cd server
 El repositorio incluye hooks de mensajes de commit que refuerzan Conventional Commits localmente antes de hacer push.
 
 **Linux / macOS:**
+
 ```bash
 ./scripts/install-hooks.sh
 ```
 
 **Windows (PowerShell):**
+
 ```powershell
 ./scripts/install-hooks.ps1
 ```
@@ -322,11 +315,11 @@ go test ./test/...
 
 1. **Abre un issue** — describe el bug o feature en el que quieres trabajar. Esto evita trabajo duplicado y permite alinear el enfoque antes de invertir tiempo.
 2. **Crea una rama** desde `main`:
-   ```bash
-   git checkout -b feat/mi-funcionalidad
-   # o
-   git checkout -b fix/el-bug
-   ```
+    ```bash
+    git checkout -b feat/mi-funcionalidad
+    # o
+    git checkout -b fix/el-bug
+    ```
 3. **Realiza tus cambios** y añade tests en `test/<paquete>/`.
 4. **Ejecuta la suite completa** localmente (ver [Ejecutar los tests](#ejecutar-los-tests)).
 5. **Confirma los cambios** siguiendo las [Convenciones de commits](#convenciones-de-commits).
@@ -379,28 +372,27 @@ Este proyecto usa [Conventional Commits](https://www.conventionalcommits.org/es/
 
 ### Tipos permitidos
 
-| Tipo | Cuándo usarlo |
-|------|--------------|
-| `feat` | Una nueva funcionalidad |
-| `fix` | Corrección de un bug |
-| `docs` | Solo cambios en documentación |
+| Tipo       | Cuándo usarlo                                                 |
+| ---------- | ------------------------------------------------------------- |
+| `feat`     | Una nueva funcionalidad                                       |
+| `fix`      | Corrección de un bug                                          |
+| `docs`     | Solo cambios en documentación                                 |
 | `refactor` | Cambio de código que no corrige un bug ni añade funcionalidad |
-| `perf` | Mejora de rendimiento |
-| `test` | Añadir o actualizar tests |
-| `build` | Cambios en el sistema de build o dependencias |
-| `ci` | Cambios en la configuración de CI |
-| `chore` | Mantenimiento (actualizar go.sum, herramientas, …) |
-| `revert` | Revierte un commit anterior |
-| `style` | Formato, punto y coma olvidado, etc. |
+| `perf`     | Mejora de rendimiento                                         |
+| `test`     | Añadir o actualizar tests                                     |
+| `build`    | Cambios en el sistema de build o dependencias                 |
+| `ci`       | Cambios en la configuración de CI                             |
+| `chore`    | Mantenimiento (actualizar go.sum, herramientas, …)            |
+| `revert`   | Revierte un commit anterior                                   |
+| `style`    | Formato, punto y coma olvidado, etc.                          |
 
 ### Ejemplos
 
 ```
-feat(grpc): añadir soporte para RPCs server-streaming
 fix(router): resolver extracción de params con trailing slash
-docs(sse): añadir ejemplo de reconexión al README
+docs(router): añadir ejemplo de versionado al README
 test(middleware): añadir test de condición de carrera en rate limiter
-feat!: renombrar ListenGRPC a StartGRPC
+feat!: renombrar opción de versionado de rutas
 ```
 
 Para **cambios con ruptura de compatibilidad**, añade `!` tras el tipo/alcance o incluye un pie `BREAKING CHANGE:`.

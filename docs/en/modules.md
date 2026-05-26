@@ -50,12 +50,12 @@ var MyModule = nexgou.Module(nexgou.ModuleOptions{
 })
 ```
 
-| Field | Type | Description |
-|:---|:---|:---|
-| `Imports` | `[]nexgou.IModule` | Other modules to import. Their exported providers become available for injection here. |
-| `Controllers` | `[]any` | **Constructor functions** (not instances) for HTTP/WS/gRPC controllers. |
-| `Providers` | `[]any` | **Constructor functions** for services, repositories, factories, etc. |
-| `Exports` | `[]any` | Subset of `Providers` constructors to make available to modules that import this one. |
+| Field         | Type               | Description                                                                            |
+| :------------ | :----------------- | :------------------------------------------------------------------------------------- |
+| `Imports`     | `[]nexgou.IModule` | Other modules to import. Their exported providers become available for injection here. |
+| `Controllers` | `[]any`            | **Constructor functions** (not instances) for HTTP controllers.                        |
+| `Providers`   | `[]any`            | **Constructor functions** for services, repositories, factories, etc.                  |
+| `Exports`     | `[]any`            | Subset of `Providers` constructors to make available to modules that import this one.  |
 
 > **Important:** `Controllers` and `Providers` take **constructor functions**, not struct instances. The IoC container calls them, resolving their parameters automatically.
 

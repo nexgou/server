@@ -8,7 +8,6 @@ import (
 	"github.com/nexgou/server/src/app"
 	"github.com/nexgou/server/src/common"
 	"github.com/nexgou/server/src/core"
-	nexgouws "github.com/nexgou/server/src/websocket"
 )
 
 // ── minimal module & controller helpers ──────────────────────────────────────
@@ -105,17 +104,6 @@ func TestCreateApp_NestedModules(t *testing.T) {
 	}
 }
 
-// ── WSController detection ────────────────────────────────────────────────────
-
-func TestCreateApp_WSController(t *testing.T) {
-	m := core.NewModule(common.ModuleOptions{
-		Controllers: []any{func() *wsController { return &wsController{} }},
-	})
-	// Just verify CreateApp doesn't panic when a WSController is wired.
-	a := app.CreateApp(m)
-	_ = a.Handler()
-}
-
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 type errController struct{}
@@ -133,13 +121,4 @@ type captureFilter struct{}
 func (f *captureFilter) Catch(_ error, ctx *common.Context) error {
 	ctx.Writer.WriteHeader(http.StatusTeapot)
 	return nil
-}
-
-type wsController struct{}
-
-func (c *wsController) Register() []common.Route { return nil }
-func (c *wsController) RegisterWS() []nexgouws.WSRoute {
-	return []nexgouws.WSRoute{
-		nexgouws.NewRoute("/ws", func(ctx *nexgouws.WSContext) error { return nil }),
-	}
 }
