@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	nexgou "github.com/nexgou/server"
 	benchapp "github.com/nexgou/server/benchmark/nexgou/app"
+	fasthttpadapter "github.com/nexgou/server/src/adapters/fasthttp"
 )
 
 func main() {
@@ -21,7 +21,7 @@ func main() {
 	defer store.Close()
 
 	app := benchapp.NewNexGouApp(config, store)
-	if err := nexgou.ListenAndServe(":"+env("PORT", "3001"), app); err != nil {
+	if err := fasthttpadapter.ListenAndServe(":"+env("PORT", "3001"), app.Handler()); err != nil {
 		log.Fatal(err)
 	}
 }

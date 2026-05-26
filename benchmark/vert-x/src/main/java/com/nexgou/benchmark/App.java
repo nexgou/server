@@ -43,6 +43,10 @@ public final class App {
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
         router.get("/health").handler(app::health);
+        router.get("/plaintext").handler(app::plaintext);
+        router.get("/json").handler(app::rawJson);
+        router.get("/params/:id").handler(app::rawParams);
+        router.get("/middleware").handler(app::rawMiddleware);
         router.post("/users").handler(app::create);
         router.get("/users").handler(app::list);
         router.get("/users/:id").handler(app::find);
@@ -53,6 +57,23 @@ public final class App {
 
     private void health(RoutingContext context) {
         json(context, 200, new JsonObject().put("status", "ok").put("service", service).put("version", version));
+    }
+
+    private void plaintext(RoutingContext context) {
+        context.response().setStatusCode(200).putHeader("Content-Type", "text/plain; charset=utf-8").end("Hello, World!");
+    }
+
+    private void rawJson(RoutingContext context) {
+        json(context, 200, new JsonObject().put("message", "Hello, World!"));
+    }
+
+    private void rawParams(RoutingContext context) {
+        json(context, 200, new JsonObject().put("id", context.pathParam("id")).put("echo", "value"));
+    }
+
+    private void rawMiddleware(RoutingContext context) {
+        context.response().putHeader("X-Raw-Middleware", "true");
+        json(context, 200, new JsonObject().put("service", service).put("version", version).put("guard", true).put("interceptor", true));
     }
 
     private void create(RoutingContext context) {

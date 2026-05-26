@@ -16,6 +16,18 @@ store.Migrate();
 
 app.MapGet("/health", () => Results.Json(new { status = "ok", service = serviceName, version = serviceVersion }));
 
+app.MapGet("/plaintext", () => Results.Text("Hello, World!", "text/plain"));
+
+app.MapGet("/json", () => Results.Json(new { message = "Hello, World!" }));
+
+app.MapGet("/params/{id}", (string id) => Results.Json(new { id, echo = "value" }));
+
+app.MapGet("/middleware", (HttpContext context) =>
+{
+    context.Response.Headers["X-Raw-Middleware"] = "true";
+    return Results.Json(new { service = serviceName, version = serviceVersion, guard = true, interceptor = true });
+});
+
 app.MapPost("/users", (UserPayload payload) =>
 {
     if (!payload.Valid())

@@ -1,35 +1,29 @@
-# NexGou Smoke Benchmark
+# HTTP Benchmark Report
 
-Estado: ejecutado correctamente con k6 local.
+## Metadata
 
-Comando esperado:
+| Campo     | Valor          |
+| --------- | -------------- |
+| Servicio  | `nexgou`  |
+| Fecha     | `2026-05-26T10:36:09+02:00`     |
+| Escenario | `smoke` |
+| Base URL  | `http://localhost:3001` |
 
-```bash
-k6 run -e BASE_URL=http://localhost:3001 --summary-export benchmark/_shared/k6/results/nexgou-smoke.json benchmark/_shared/k6/scenarios/smoke.js
-```
+## Metricas obligatorias
 
-Metricas smoke:
+| Metrica     |            Valor |
+| ----------- | ---------------: |
+| throughput  | `124.17526925337549 req/s` |
+| p50         |        `n/a ms` |
+| p95         |        `2.228325 ms` |
+| p99         |        `n/a ms` |
+| error rate  | `n/a` |
+| checks      |     `n/a` |
+| CPU         |        `n/a` |
+| memoria     |     `n/a` |
+| estabilidad |  `pending review` |
 
-| Metrica     |                              Valor |
-| ----------- | ---------------------------------: |
-| throughput  |                       214.64 req/s |
-| p50         |                          814.95 us |
-| p95         |                            1.68 ms |
-| p99         |             no reportado por smoke |
-| error rate  |                              0.00% |
-| checks      |                        12/12, 100% |
-| CPU         | pendiente de Docker/observabilidad |
-| memoria     | pendiente de Docker/observabilidad |
-| estabilidad |                           smoke OK |
+## Notas
 
-Metricas CRUD mixto corto:
-
-| Metrica    |             Valor |
-| ---------- | ----------------: |
-| VUs        |                 2 |
-| duracion   |                3s |
-| throughput |     3884.95 req/s |
-| p50        |          526.5 us |
-| p95        |         735.02 us |
-| error rate |             0.00% |
-| checks     | 23368/23368, 100% |
+- El JSON de k6 debe guardarse en `benchmark/_shared/k6/results/`.
+- El informe generado debe guardarse en `benchmark/_shared/reports/generated/`.

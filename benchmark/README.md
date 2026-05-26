@@ -4,15 +4,15 @@ Laboratorio reproducible para comparar NexGou contra otros servidores HTTP usand
 
 ## Servidores
 
-| Servicio | Stack | Puerto |
-| -------- | ----- | ------ |
-| `nexgou` | Go + NexGou | 3001 |
-| `fastify` | Node.js + Fastify | 3002 |
-| `asp-kestrel` | ASP.NET Core Minimal API | 3003 |
-| `actix-web` | Rust + Actix Web | 3004 |
-| `hyper` | Rust + Hyper | 3005 |
-| `vert-x` | Java + Vert.x Web | 3006 |
-| `ajax-php` | PHP + PDO SQLite | 3007 |
+| Servicio      | Stack                    | Puerto |
+| ------------- | ------------------------ | ------ |
+| `nexgou`      | Go + NexGou              | 3001   |
+| `fastify`     | Node.js + Fastify        | 3002   |
+| `asp-kestrel` | ASP.NET Core Minimal API | 3003   |
+| `actix-web`   | Rust + Actix Web         | 3004   |
+| `hyper`       | Rust + Hyper             | 3005   |
+| `vert-x`      | Java + Vert.x Web        | 3006   |
+| `ajax-php`    | PHP + PDO SQLite         | 3007   |
 
 ## Contrato
 

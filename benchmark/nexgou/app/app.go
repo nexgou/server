@@ -9,6 +9,8 @@ import (
 	"time"
 
 	nexgou "github.com/nexgou/server"
+	"github.com/nexgou/server/src/filter"
+	"github.com/nexgou/server/src/middleware"
 	_ "modernc.org/sqlite"
 )
 
@@ -271,11 +273,14 @@ func (controller *Controller) Delete(ctx *nexgou.Context) error {
 
 func NewNexGouApp(config Config, store *Store) *nexgou.App {
 	module := nexgou.Module(nexgou.ModuleOptions{
-		Controllers: []any{func() *Controller { return NewController(store, config) }},
+		Controllers: []any{
+			func() *Controller { return NewController(store, config) },
+			func() *RawController { return NewRawController(config.ServiceName, config.Version) },
+		},
 	})
 	app := nexgou.CreateApp(module)
-	app.Use(nexgou.Recovery())
-	app.SetFilter(&nexgou.HttpExceptionFilter{})
+	app.Use(middleware.Recovery())
+	app.SetFilter(&filter.HttpExceptionFilter{})
 	return app
 }
 

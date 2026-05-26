@@ -88,8 +88,12 @@ async fn route(request: Request<Body>, state: Arc<State>) -> Result<Response<Bod
     let path = uri.path().to_string();
     let response = match (method, path.as_str()) {
         (Method::GET, "/health") => json(StatusCode::OK, serde_json::json!({ "status": "ok", "service": state.config.service, "version": state.config.version })),
+        (Method::GET, "/plaintext") => plaintext(),
+        (Method::GET, "/json") => json(StatusCode::OK, serde_json::json!({ "message": "Hello, World!" })),
+        (Method::GET, "/middleware") => raw_middleware(state),
         (Method::POST, "/users") => create(request, state).await,
         (Method::GET, "/users") => list(&uri, state),
+        _ if path.starts_with("/params/") => raw_params(&path),
         _ => match parse_user_id(&path) {
             Some(id) => match *request.method() {
                 Method::GET => get_user(id, state),
@@ -246,6 +250,33 @@ fn json<T: Serialize>(status: StatusCode, body: T) -> Response<Body> {
         .status(status)
         .header(CONTENT_TYPE, "application/json")
         .body(Body::from(serde_json::to_vec(&body).unwrap()))
+        .unwrap()
+}
+
+fn plaintext() -> Response<Body> {
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "text/plain; charset=utf-8")
+        .body(Body::from("Hello, World!"))
+        .unwrap()
+}
+
+fn raw_params(path: &str) -> Response<Body> {
+    let id = path.trim_start_matches("/params/");
+    json(StatusCode::OK, serde_json::json!({ "id": id, "echo": "value" }))
+}
+
+fn raw_middleware(state: Arc<State>) -> Response<Body> {
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "application/json")
+        .header("X-Raw-Middleware", "true")
+        .body(Body::from(serde_json::to_vec(&serde_json::json!({
+            "service": state.config.service,
+            "version": state.config.version,
+            "guard": true,
+            "interceptor": true
+        })).unwrap()))
         .unwrap()
 }
 

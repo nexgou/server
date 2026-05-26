@@ -75,6 +75,29 @@ if ($method === 'GET' && $path === '/health') {
     return;
 }
 
+if ($method === 'GET' && $path === '/plaintext') {
+    http_response_code(200);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo 'Hello, World!';
+    return;
+}
+
+if ($method === 'GET' && $path === '/json') {
+    send_json(200, ['message' => 'Hello, World!']);
+    return;
+}
+
+if ($method === 'GET' && preg_match('#^/params/([^/]+)$#', $path, $matches)) {
+    send_json(200, ['id' => $matches[1], 'echo' => 'value']);
+    return;
+}
+
+if ($method === 'GET' && $path === '/middleware') {
+    header('X-Raw-Middleware: true');
+    send_json(200, ['service' => $serviceName, 'version' => $serviceVersion, 'guard' => true, 'interceptor' => true]);
+    return;
+}
+
 if ($method === 'POST' && $path === '/users') {
     $payload = read_payload();
     if ($payload === null) {
