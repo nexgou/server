@@ -50,12 +50,12 @@ var MyModule = nexgou.Module(nexgou.ModuleOptions{
 })
 ```
 
-| Campo | Tipo | Descripción |
-|:---|:---|:---|
-| `Imports` | `[]nexgou.IModule` | Otros módulos a importar. Sus proveedores exportados quedan disponibles para inyección aquí. |
-| `Controllers` | `[]any` | **Funciones constructoras** (no instancias) para controladores HTTP/WS/gRPC. |
-| `Providers` | `[]any` | **Funciones constructoras** para servicios, repositorios, factories, etc. |
-| `Exports` | `[]any` | Subconjunto de constructores de `Providers` a poner a disposición de los módulos que importan este. |
+| Campo         | Tipo               | Descripción                                                                                         |
+| :------------ | :----------------- | :-------------------------------------------------------------------------------------------------- |
+| `Imports`     | `[]nexgou.IModule` | Otros módulos a importar. Sus proveedores exportados quedan disponibles para inyección aquí.        |
+| `Controllers` | `[]any`            | **Funciones constructoras** (no instancias) para controladores HTTP.                                |
+| `Providers`   | `[]any`            | **Funciones constructoras** para servicios, repositorios, factories, etc.                           |
+| `Exports`     | `[]any`            | Subconjunto de constructores de `Providers` a poner a disposición de los módulos que importan este. |
 
 > **Importante:** `Controllers` y `Providers` reciben **funciones constructoras**, no instancias de struct. El contenedor IoC las llama y resuelve sus parámetros automáticamente.
 

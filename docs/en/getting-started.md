@@ -67,11 +67,9 @@ When you call `nexgou.CreateApp(root)`, the framework:
 3. Detects provider exports and makes them available to importing modules
 4. Instantiates all `Controllers` via the container (injects dependencies automatically)
 5. Calls `Register()` on HTTP controllers → registers routes
-6. Calls `RegisterWS()` on WebSocket controllers → registers WS upgrade routes
-7. Calls `RegisterGRPC()` on gRPC controllers → registers gRPC service descriptors
-8. Returns a ready `*App` — no network ports are open yet
+6. Returns a ready `*App` — no network ports are open yet
 
-`app.Listen(port)` / `app.ListenGRPC(port)` open the actual network listeners.
+`app.Listen(port)` opens the actual network listener.
 
 ---
 
@@ -248,16 +246,13 @@ curl -X POST http://localhost:3000/users -H 'Content-Type: application/json' -d 
 
 ## Next Steps
 
-| Topic | Guide |
-|:---|:---|
-| Module system, DI, exports | [Modules](modules.md) |
-| Route versioning, guards, interceptors, pipes | [Controllers](controllers.md) |
-| Full middleware reference | [Middleware](middleware.md) |
-| Security headers, rate limiting, timeout | [Security](security.md) |
-| Real-time WebSocket | [WebSocket](websocket.md) |
-| Server-Sent Events | [Server-Sent Events](sse.md) |
-| gRPC (no `.proto`) | [gRPC](grpc.md) |
-| Env vars & config | [Config](config.md) |
-| Structured logging | [Logger](logger.md) |
-| Unit & integration tests | [Testing](testing.md) |
-| Complete working sample | [`samples/api`](../samples/api) |
+| Topic                                         | Guide                           |
+| :-------------------------------------------- | :------------------------------ |
+| Module system, DI, exports                    | [Modules](modules.md)           |
+| Route versioning, guards, interceptors, pipes | [Controllers](controllers.md)   |
+| Full middleware reference                     | [Middleware](middleware.md)     |
+| Security headers, rate limiting, timeout      | [Security](security.md)         |
+| Env vars & config                             | [Config](config.md)             |
+| Structured logging                            | [Logger](logger.md)             |
+| Unit & integration tests                      | [Testing](testing.md)           |
+| Complete working sample                       | [`samples/api`](../samples/api) |

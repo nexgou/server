@@ -14,9 +14,6 @@
 - [Interceptors](#interceptors)
 - [Pipes](#pipes)
 - [Exception Filters](#exception-filters)
-- [WebSocket Controllers](#websocket-controllers)
-- [gRPC Controllers](#grpc-controllers)
-- [Combining Transports](#combining-transports)
 
 ---
 
@@ -59,13 +56,13 @@ var ProductModule = nexgou.Module(nexgou.ModuleOptions{
 
 All route helpers return a `nexgou.Route` that supports fluent chaining.
 
-| Function | HTTP Method | Example |
-|:---|:---|:---|
-| `nexgou.Get(path, handler)` | GET | `nexgou.Get("/users", c.List)` |
-| `nexgou.Post(path, handler)` | POST | `nexgou.Post("/users", c.Create)` |
-| `nexgou.Put(path, handler)` | PUT | `nexgou.Put("/users/:id", c.Replace)` |
-| `nexgou.Patch(path, handler)` | PATCH | `nexgou.Patch("/users/:id", c.Update)` |
-| `nexgou.Delete(path, handler)` | DELETE | `nexgou.Delete("/users/:id", c.Remove)` |
+| Function                       | HTTP Method | Example                                 |
+| :----------------------------- | :---------- | :-------------------------------------- |
+| `nexgou.Get(path, handler)`    | GET         | `nexgou.Get("/users", c.List)`          |
+| `nexgou.Post(path, handler)`   | POST        | `nexgou.Post("/users", c.Create)`       |
+| `nexgou.Put(path, handler)`    | PUT         | `nexgou.Put("/users/:id", c.Replace)`   |
+| `nexgou.Patch(path, handler)`  | PATCH       | `nexgou.Patch("/users/:id", c.Update)`  |
+| `nexgou.Delete(path, handler)` | DELETE      | `nexgou.Delete("/users/:id", c.Remove)` |
 
 ### URL parameters
 
@@ -129,15 +126,15 @@ return nexgou.Exception(422, "Unprocessable Entity")
 
 ### Full Context API
 
-| Method | Signature | Description |
-|:---|:---|:---|
-| `Method` | `() string` | HTTP verb |
-| `Path` | `() string` | URL path |
-| `Param` | `(key string) string` | Named URL parameter |
-| `Params` | `() map[string]string` | All URL parameters (copy) |
-| `Header` | `(key string) string` | Request header value |
-| `Body` | `(target any) error` | JSON-decode request body into `target` |
-| `JSON` | `(status int, data any) error` | Write JSON response |
+| Method   | Signature                      | Description                            |
+| :------- | :----------------------------- | :------------------------------------- |
+| `Method` | `() string`                    | HTTP verb                              |
+| `Path`   | `() string`                    | URL path                               |
+| `Param`  | `(key string) string`          | Named URL parameter                    |
+| `Params` | `() map[string]string`         | All URL parameters (copy)              |
+| `Header` | `(key string) string`          | Request header value                   |
+| `Body`   | `(target any) error`           | JSON-decode request body into `target` |
+| `JSON`   | `(status int, data any) error` | Write JSON response                    |
 
 ---
 
@@ -225,16 +222,17 @@ nexgou.Post("/uploads", c.Upload).
 ```
 
 Multiple interceptors form a nested chain:
+
 ```
 interceptor1.before → interceptor2.before → handler → interceptor2.after → interceptor1.after
 ```
 
 ### Built-in interceptors
 
-| Interceptor | Package | Description |
-|:---|:---|:---|
-| `TimeoutInterceptor` | `src/middleware` | Per-route request deadline |
-| `BodyLimitInterceptor` | `src/middleware` | Per-route body size cap |
+| Interceptor            | Package          | Description                |
+| :--------------------- | :--------------- | :------------------------- |
+| `TimeoutInterceptor`   | `src/middleware` | Per-route request deadline |
+| `BodyLimitInterceptor` | `src/middleware` | Per-route body size cap    |
 
 See [Security](security.md) for details.
 
@@ -265,11 +263,11 @@ func (c *Controller) GetUser(ctx *nexgou.Context) error {
 
 ### Built-in pipes
 
-| Pipe | Description | Returns |
-|:---|:---|:---|
-| `ParseIntPipe` | Validates and parses string as `int` | `int` or 400 error |
-| `ParseUUIDPipe` | Validates string is 36-char UUID format | `string` or 400 error |
-| `DefaultValuePipe{Default: "..."}` | Returns fallback when input is empty | `string` |
+| Pipe                               | Description                             | Returns               |
+| :--------------------------------- | :-------------------------------------- | :-------------------- |
+| `ParseIntPipe`                     | Validates and parses string as `int`    | `int` or 400 error    |
+| `ParseUUIDPipe`                    | Validates string is 36-char UUID format | `string` or 400 error |
+| `DefaultValuePipe{Default: "..."}` | Returns fallback when input is empty    | `string`              |
 
 ### Custom pipe
 
@@ -328,94 +326,4 @@ func (f *AppExceptionFilter) Catch(err error, ctx *nexgou.Context) error {
 }
 
 app.SetFilter(&AppExceptionFilter{})
-```
-
----
-
-## WebSocket Controllers
-
-A WebSocket controller implements `RegisterWS()` instead of (or alongside) `Register()`.
-
-```go
-type ChatController struct{}
-
-func (c *ChatController) Register() []nexgou.Route {
-    return nil // no HTTP routes
-}
-
-func (c *ChatController) RegisterWS() []nexgou.WSRoute {
-    return []nexgou.WSRoute{
-        nexgou.WS("/chat/echo", c.Echo),
-    }
-}
-
-func (c *ChatController) Echo(ctx *nexgou.WSContext) error {
-    for {
-        msg, err := ctx.Receive()
-        if err != nil {
-            return nil // client disconnected
-        }
-        if err := ctx.Send(msg); err != nil {
-            return err
-        }
-    }
-}
-```
-
-See [WebSocket](websocket.md) for the full guide.
-
----
-
-## gRPC Controllers
-
-A gRPC controller implements `RegisterGRPC()`:
-
-```go
-func (c *GreeterController) RegisterGRPC() []nexgou.GRPCRoute {
-    return []nexgou.GRPCRoute{
-        nexgou.GRPC(Greeter_ServiceDesc, c).Guard(&AuthGuard{}),
-    }
-}
-```
-
-See [gRPC](grpc.md) for the full guide including service descriptors and streaming.
-
----
-
-## Combining Transports
-
-A single controller can implement all three transport interfaces simultaneously. The framework detects which interfaces are implemented and registers the routes accordingly.
-
-```go
-type GreeterController struct{ svc *GreeterService }
-
-// HTTP
-func (c *GreeterController) Register() []nexgou.Route {
-    return []nexgou.Route{
-        nexgou.Get("/health", c.Health),
-    }
-}
-
-// WebSocket
-func (c *GreeterController) RegisterWS() []nexgou.WSRoute {
-    return []nexgou.WSRoute{
-        nexgou.WS("/greet/live", c.LiveGreet),
-    }
-}
-
-// gRPC
-func (c *GreeterController) RegisterGRPC() []nexgou.GRPCRoute {
-    return []nexgou.GRPCRoute{
-        nexgou.GRPC(Greeter_ServiceDesc, c),
-    }
-}
-```
-
-All three are registered from the same module entry:
-
-```go
-var GreeterModule = nexgou.Module(nexgou.ModuleOptions{
-    Controllers: []any{NewGreeterController},
-    Providers:   []any{NewGreeterService},
-})
 ```

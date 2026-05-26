@@ -95,15 +95,15 @@ Después añade Rust, Python, Java, Elixir y PHP.
 
 La primera preparacion del laboratorio deja implementados los directorios existentes bajo `benchmark/`:
 
-| Servicio | Stack | Puerto |
-| -------- | ----- | ------ |
-| `nexgou` | Go + NexGou | 3001 |
-| `fastify` | Node.js + Fastify | 3002 |
-| `asp-kestrel` | ASP.NET Core Minimal API | 3003 |
-| `actix-web` | Rust + Actix Web | 3004 |
-| `hyper` | Rust + Hyper | 3005 |
-| `vert-x` | Java + Vert.x Web | 3006 |
-| `ajax-php` | PHP + PDO SQLite | 3007 |
+| Servicio      | Stack                    | Puerto |
+| ------------- | ------------------------ | ------ |
+| `nexgou`      | Go + NexGou              | 3001   |
+| `fastify`     | Node.js + Fastify        | 3002   |
+| `asp-kestrel` | ASP.NET Core Minimal API | 3003   |
+| `actix-web`   | Rust + Actix Web         | 3004   |
+| `hyper`       | Rust + Hyper             | 3005   |
+| `vert-x`      | Java + Vert.x Web        | 3006   |
+| `ajax-php`    | PHP + PDO SQLite         | 3007   |
 
 Competidores documentados pero no implementados en esta fase, como Gin, Fiber, FastAPI, Phoenix, Quarkus/Spring o Laravel Octane, quedan para una iteracion posterior.
 

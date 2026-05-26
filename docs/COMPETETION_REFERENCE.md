@@ -28,6 +28,41 @@ Go performance + ASP.NET Core architecture + Fastify/NestJS developer experience
 
 ---
 
+## Diferencias frente a competidores directos
+
+Esta tabla resume donde NexGou busca diferenciarse: no competir solo como router, sino como framework de aplicacion completo para Go, con una DX cercana a NestJS y una base de rendimiento cercana al ecosistema Go/fasthttp.
+
+Leyenda: `✅` incluido o enfoque principal, `⚠️` disponible parcialmente o mediante patrones externos, `❌` no es parte central del framework.
+
+| Capacidad / criterio                         | NexGou | Gin | Fiber | Echo | Fastify | NestJS | ASP.NET Core |
+| -------------------------------------------- | :----: | :-: | :---: | :--: | :-----: | :----: | :----------: |
+| Framework de aplicacion, no solo router      |   ✅   | ❌  |  ❌   |  ❌  |   ⚠️    |   ✅   |      ✅      |
+| Sistema de modulos por dominio               |   ✅   | ❌  |  ❌   |  ❌  |   ⚠️    |   ✅   |      ✅      |
+| Inyeccion de dependencias integrada          |   ✅   | ❌  |  ❌   |  ❌  |   ❌    |   ✅   |      ✅      |
+| Guards / autorizacion por ruta               |   ✅   | ⚠️  |  ⚠️   |  ⚠️  |   ⚠️    |   ✅   |      ✅      |
+| Interceptors antes/despues del handler       |   ✅   | ❌  |  ❌   |  ❌  |   ⚠️    |   ✅   |      ✅      |
+| Pipes de validacion y transformacion         |   ✅   | ❌  |  ❌   |  ❌  |   ✅    |   ✅   |      ⚠️      |
+| Filtros de excepciones centralizados         |   ✅   | ⚠️  |  ⚠️   |  ⚠️  |   ⚠️    |   ✅   |      ✅      |
+| Configuracion inyectable                     |   ✅   | ❌  |  ❌   |  ❌  |   ⚠️    |   ✅   |      ✅      |
+| Logger estructurado integrado                |   ✅   | ⚠️  |  ⚠️   |  ⚠️  |   ✅    |   ✅   |      ✅      |
+| Middleware de seguridad incluido             |   ✅   | ⚠️  |  ⚠️   |  ⚠️  |   ⚠️    |   ⚠️   |      ✅      |
+| Testing helpers del framework                |   ✅   | ❌  |  ❌   |  ❌  |   ⚠️    |   ✅   |      ✅      |
+| Versionado de rutas                          |   ✅   | ⚠️  |  ⚠️   |  ⚠️  |   ⚠️    |   ✅   |      ✅      |
+| Adapter `fasthttp` orientado a performance   |   ✅   | ❌  |  ✅   |  ❌  |   ❌    |   ❌   |      ❌      |
+| Compatibilidad futura con adapter `net/http` |   ⚠️   | ✅  |  ❌   |  ✅  |   ❌    |   ❌   |      ❌      |
+| DX inspirada en NestJS usando Go idiomatic   |   ✅   | ❌  |  ❌   |  ❌  |   ⚠️    |   ✅   |      ⚠️      |
+| Benchmark reproducible en el repositorio     |   ✅   | ⚠️  |  ⚠️   |  ⚠️  |   ✅    |   ⚠️   |      ✅      |
+
+Lectura rapida:
+
+- Gin, Fiber y Echo son excelentes routers, pero dejan la arquitectura de aplicacion al usuario.
+- Fastify aporta una gran DX en Node.js, especialmente con plugins y schemas, pero no tiene el rendimiento ni el binario simple de Go.
+- NestJS aporta la mejor referencia de arquitectura y DX, pero corre sobre Node.js y tiene mayor overhead runtime.
+- ASP.NET Core es la referencia mas fuerte en arquitectura enterprise y rendimiento maduro, pero pertenece al ecosistema .NET.
+- NexGou intenta ocupar el espacio intermedio: arquitectura de framework completo, ergonomia tipo NestJS y rendimiento Go con `fasthttp`.
+
+---
+
 ## Ranking general: mejor referencia para crear un framework
 
 Este ranking prioriza valor arquitectónico + rendimiento + ecosistema + ideas aprovechables.

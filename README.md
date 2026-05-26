@@ -30,7 +30,7 @@
 
 ## ✨ Overview
 
-**Nexgou** is a high-performance, opinionated Go framework inspired by [NestJS](https://nestjs.com). It brings a structured, modular architecture with first-class dependency injection, guards, interceptors, and real-time transports (WebSocket, SSE, gRPC) — all from a single import, without sacrificing Go's speed.
+**Nexgou** is a high-performance, opinionated Go framework inspired by [NestJS](https://nestjs.com). It brings a structured, modular architecture with first-class dependency injection, guards and interceptors — all from a single import, without sacrificing Go's speed.
 
 Go has excellent HTTP libraries (Gin, Fiber, Echo) but they are mostly **routers**. Nexgou is a **full application framework** that gives you everything you need to build production-grade APIs out of the box.
 
@@ -190,27 +190,6 @@ Gin, Fiber and Echo are excellent **routers**. But when you start building a rea
       <td align="center">⚠️ 3rd party</td>
     </tr>
     <tr>
-      <td><strong>WebSocket</strong> — first-class controller + guards on upgrade</td>
-      <td align="center">✅ built-in</td>
-      <td align="center">⚠️ 3rd party</td>
-      <td align="center">⚠️ 3rd party</td>
-      <td align="center">⚠️ 3rd party</td>
-    </tr>
-    <tr>
-      <td><strong>Server-Sent Events</strong></td>
-      <td align="center">✅ built-in</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-    </tr>
-    <tr>
-      <td><strong>gRPC</strong> — no <code>.proto</code>, guards on unary RPCs</td>
-      <td align="center">✅ built-in</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-    </tr>
-    <tr>
       <td><strong>ConfigModule</strong> — typed, injectable env-var access</td>
       <td align="center">✅ built-in</td>
       <td align="center">❌</td>
@@ -325,30 +304,24 @@ See [`samples/api`](samples/api) for a complete, working example with all featur
 
 ## 📚 Documentation
 
-| Guide | Description |
-| :--- | :--- |
-| [Getting Started](docs/en/getting-started.md) | Installation, first app, bootstrap lifecycle |
-| [Modules](docs/en/modules.md) | Module system, feature modules, imports & exports |
-| [Controllers](docs/en/controllers.md) | Routes, versioning, guards, interceptors, pipes |
-| [Middleware](docs/en/middleware.md) | Logger, Recovery, CORS, and the full pipeline |
-| [Security](docs/en/security.md) | Security headers, rate limiting, timeout, body limit |
-| [WebSocket](docs/en/websocket.md) | `WSController`, `WSContext`, broadcast patterns |
-| [Server-Sent Events](docs/en/sse.md) | `SSEContext`, named events, reconnect, client disconnect |
-| [gRPC](docs/en/grpc.md) | `GRPCController`, service descriptors, streaming, guards |
-| [Config](docs/en/config.md) | `ConfigService`, typed env-var access |
-| [Logger](docs/en/logger.md) | `LoggerService`, levels, scoped loggers, JSON output |
-| [Testing](docs/en/testing.md) | `nexgoutest` unit & integration helpers |
+| Guide                                         | Description                                          |
+| :-------------------------------------------- | :--------------------------------------------------- |
+| [Getting Started](docs/en/getting-started.md) | Installation, first app, bootstrap lifecycle         |
+| [Modules](docs/en/modules.md)                 | Module system, feature modules, imports & exports    |
+| [Controllers](docs/en/controllers.md)         | Routes, versioning, guards, interceptors, pipes      |
+| [Middleware](docs/en/middleware.md)           | Logger, Recovery, CORS, and the full pipeline        |
+| [Security](docs/en/security.md)               | Security headers, rate limiting, timeout, body limit |
+| [Config](docs/en/config.md)                   | `ConfigService`, typed env-var access                |
+| [Logger](docs/en/logger.md)                   | `LoggerService`, levels, scoped loggers, JSON output |
+| [Testing](docs/en/testing.md)                 | `nexgoutest` unit & integration helpers              |
 
 ---
 
 ## 🗂 Sample Applications
 
-| Sample | Transports | Key features demonstrated |
-| :--- | :---: | :--- |
-| [`samples/api`](samples/api) | HTTP + WS + SSE | Full middleware pipeline, guards, interceptors, DI, versioning |
-| [`samples/chat`](samples/chat) | WebSocket | Broadcast hub, multi-client room, scoped logger |
-| [`samples/sse`](samples/sse) | SSE + HTTP | Named events, topic filtering, snapshot endpoint |
-| [`samples/grpc`](samples/grpc) | gRPC + HTTP | Hand-written service descriptors, streaming, no `.proto` |
+| Sample                       | Transports | Key features demonstrated                                      |
+| :--------------------------- | :--------: | :------------------------------------------------------------- |
+| [`samples/api`](samples/api) |    HTTP    | Full middleware pipeline, guards, interceptors, DI, versioning |
 
 ---
 
@@ -364,15 +337,11 @@ See [`samples/api`](samples/api) for a complete, working example with all featur
 - [x] Middleware pipeline (global & scoped)
 - [x] Guards, Interceptors, Pipes
 - [x] Exception Filters
-- [x] WebSocket — `WSController`, `WSContext`, guards
-- [x] SSE — `SSEContext`, named events, auto-reconnect
-- [x] gRPC — `GRPCController`, guards on unary RPCs, no `.proto`
 - [x] `ConfigModule` & `LogModule`
 - [x] `nexgoutest` — unit & integration testing helpers
 - [x] Security middleware suite (headers, CORS, rate limit, timeout, body limit)
 
 </details>
-
 
 ---
 

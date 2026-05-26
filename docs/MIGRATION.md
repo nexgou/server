@@ -651,17 +651,17 @@ go test ./test/logger -run ^$ -bench . -benchmem -count=3 OK
 
 Resultados iniciales relevantes:
 
-| Benchmark                              | Variante      | ns/op aprox. | B/op | allocs/op |
-| -------------------------------------- | ------------- | -----------: | ---: | --------: |
-| JSON encode payload CRUD               | stdlib        |         2800 |  368 |         8 |
-| JSON encode payload CRUD               | sonic_std     |      2700-3200 |  940 |         6 |
-| JSON encode payload CRUD               | sonic_default |          900 |  335 |         5 |
-| JSON decode payload CRUD               | stdlib        |     7900-10300 | 2080 |        45 |
-| JSON decode payload CRUD               | sonic_std     |     2600-4200 | 1430 |        30 |
-| JSON decode payload CRUD               | sonic_default |         2100 | 1250 |        14 |
-| Logger JSON marshal                    | stdlib        |     1460-1580 |  544 |        14 |
-| Logger JSON marshal                    | sonic_std     |      690-740 |  228 |         3 |
-| Logger JSON marshal                    | sonic_default |      530-550 |  228 |         3 |
+| Benchmark                | Variante      | ns/op aprox. | B/op | allocs/op |
+| ------------------------ | ------------- | -----------: | ---: | --------: |
+| JSON encode payload CRUD | stdlib        |         2800 |  368 |         8 |
+| JSON encode payload CRUD | sonic_std     |    2700-3200 |  940 |         6 |
+| JSON encode payload CRUD | sonic_default |          900 |  335 |         5 |
+| JSON decode payload CRUD | stdlib        |   7900-10300 | 2080 |        45 |
+| JSON decode payload CRUD | sonic_std     |    2600-4200 | 1430 |        30 |
+| JSON decode payload CRUD | sonic_default |         2100 | 1250 |        14 |
+| Logger JSON marshal      | stdlib        |    1460-1580 |  544 |        14 |
+| Logger JSON marshal      | sonic_std     |      690-740 |  228 |         3 |
+| Logger JSON marshal      | sonic_default |      530-550 |  228 |         3 |
 
 Observaciones:
 

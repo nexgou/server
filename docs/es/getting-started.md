@@ -67,11 +67,9 @@ Cuando se llama a `nexgou.CreateApp(root)`, el framework:
 3. Detecta las exportaciones de proveedores y las pone a disposición de los módulos importadores
 4. Instancia todos los `Controllers` a través del contenedor (inyecta dependencias automáticamente)
 5. Llama a `Register()` en los controladores HTTP → registra rutas
-6. Llama a `RegisterWS()` en los controladores WebSocket → registra rutas de actualización WS
-7. Llama a `RegisterGRPC()` en los controladores gRPC → registra descriptores de servicio gRPC
-8. Devuelve un `*App` listo — aún no hay puertos de red abiertos
+6. Devuelve un `*App` listo — aún no hay puertos de red abiertos
 
-`app.Listen(port)` / `app.ListenGRPC(port)` abren los listeners de red reales.
+`app.Listen(port)` abre el listener de red real.
 
 ---
 
@@ -248,16 +246,13 @@ curl -X POST http://localhost:3000/users -H 'Content-Type: application/json' -d 
 
 ## Próximos pasos
 
-| Tema | Guía |
-|:---|:---|
-| Sistema de módulos, DI, exportaciones | [Módulos](modules.md) |
-| Versionado de rutas, guards, interceptores, pipes | [Controladores](controllers.md) |
-| Referencia completa de middleware | [Middleware](middleware.md) |
-| Cabeceras de seguridad, limitación de tasa, timeout | [Seguridad](security.md) |
-| WebSocket en tiempo real | [WebSocket](websocket.md) |
-| Eventos enviados por el servidor | [Server-Sent Events](sse.md) |
-| gRPC (sin `.proto`) | [gRPC](grpc.md) |
-| Variables de entorno y configuración | [Config](config.md) |
-| Logging estructurado | [Logger](logger.md) |
-| Tests unitarios e integración | [Testing](testing.md) |
-| Ejemplo completo funcional | [`samples/api`](../samples/api) |
+| Tema                                                | Guía                            |
+| :-------------------------------------------------- | :------------------------------ |
+| Sistema de módulos, DI, exportaciones               | [Módulos](modules.md)           |
+| Versionado de rutas, guards, interceptores, pipes   | [Controladores](controllers.md) |
+| Referencia completa de middleware                   | [Middleware](middleware.md)     |
+| Cabeceras de seguridad, limitación de tasa, timeout | [Seguridad](security.md)        |
+| Variables de entorno y configuración                | [Config](config.md)             |
+| Logging estructurado                                | [Logger](logger.md)             |
+| Tests unitarios e integración                       | [Testing](testing.md)           |
+| Ejemplo completo funcional                          | [`samples/api`](../samples/api) |

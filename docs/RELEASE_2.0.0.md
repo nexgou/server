@@ -11,9 +11,7 @@ Estado: release candidate local.
 
 Fuera de alcance inicial:
 
-- WebSocket;
-- SSE;
-- gRPC.
+- integraciones realtime y RPC fuera del core HTTP.
 
 ## Validacion ejecutada
 
