@@ -1,0 +1,200 @@
+{
+    "metrics": {
+        "http_req_failed": {
+            "fails": 6,
+            "passes": 0,
+            "thresholds": {
+                "rate==0": false
+            },
+            "value": 0
+        },
+        "http_req_tls_handshaking": {
+            "p(95)": 0,
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0
+        },
+        "data_received": {
+            "count": 1559,
+            "rate": 55771.19144293202
+        },
+        "iteration_duration": {
+            "avg": 27.9535,
+            "min": 27.9535,
+            "med": 27.9535,
+            "max": 27.9535,
+            "p(90)": 27.9535,
+            "p(95)": 27.9535
+        },
+        "http_req_duration": {
+            "med": 0.8149500000000001,
+            "max": 1.8578,
+            "p(90)": 1.5183499999999999,
+            "p(95)": 1.688075,
+            "avg": 0.9512999999999999,
+            "min": 0.5183
+        },
+        "http_req_sending": {
+            "avg": 0.0876,
+            "min": 0,
+            "med": 0,
+            "max": 0.5256,
+            "p(90)": 0.2628,
+            "p(95)": 0.3942
+        },
+        "http_req_connecting": {
+            "avg": 0.37516666666666665,
+            "min": 0,
+            "med": 0,
+            "max": 2.251,
+            "p(90)": 1.1255,
+            "p(95)": 1.68825
+        },
+        "http_reqs": {
+            "count": 6,
+            "rate": 214.64217360974476
+        },
+        "http_req_blocked": {
+            "max": 21.1675,
+            "p(90)": 10.58375,
+            "p(95)": 15.875625,
+            "avg": 3.5279166666666666,
+            "min": 0,
+            "med": 0
+        },
+        "checks": {
+            "passes": 12,
+            "fails": 0,
+            "thresholds": {
+                "rate==1.0": false
+            },
+            "value": 1
+        },
+        "http_req_duration{expected_response:true}": {
+            "med": 0.8149500000000001,
+            "max": 1.8578,
+            "p(90)": 1.5183499999999999,
+            "p(95)": 1.688075,
+            "avg": 0.9512999999999999,
+            "min": 0.5183
+        },
+        "http_req_receiving": {
+            "p(90)": 0.5440499999999999,
+            "p(95)": 0.544825,
+            "avg": 0.18134999999999998,
+            "min": 0,
+            "med": 0,
+            "max": 0.5456
+        },
+        "iterations": {
+            "count": 1,
+            "rate": 35.77369560162413
+        },
+        "http_req_waiting": {
+            "avg": 0.68235,
+            "min": 0.5183,
+            "med": 0.5437,
+            "max": 1.1789,
+            "p(90)": 0.98275,
+            "p(95)": 1.080825
+        },
+        "data_sent": {
+            "count": 763,
+            "rate": 27295.32974403921
+        }
+    },
+    "root_group": {
+        "checks": {
+            "health: status 200": {
+                "name": "health: status 200",
+                "path": "::health: status 200",
+                "id": "73274babb93df6aaf60956333620494b",
+                "passes": 1,
+                "fails": 0
+            },
+            "health: valid json": {
+                "fails": 0,
+                "name": "health: valid json",
+                "path": "::health: valid json",
+                "id": "983c987cb2828966911bd8f35be2caef",
+                "passes": 1
+            },
+            "create user: status 201": {
+                "name": "create user: status 201",
+                "path": "::create user: status 201",
+                "id": "8910dd7388cd40cbcb8b5601736b18f3",
+                "passes": 1,
+                "fails": 0
+            },
+            "create user: valid json": {
+                "fails": 0,
+                "name": "create user: valid json",
+                "path": "::create user: valid json",
+                "id": "3b1d2267927866c46bd5280ee1c4f581",
+                "passes": 1
+            },
+            "get user: status 200": {
+                "name": "get user: status 200",
+                "path": "::get user: status 200",
+                "id": "7a46b8e6db44763a9b614bde522e7156",
+                "passes": 1,
+                "fails": 0
+            },
+            "get user: valid json": {
+                "fails": 0,
+                "name": "get user: valid json",
+                "path": "::get user: valid json",
+                "id": "522558d3e7288cbca441b56172ad6994",
+                "passes": 1
+            },
+            "list users: status 200": {
+                "id": "b46ef3b9b570c2eef5de1933d65d03dc",
+                "passes": 1,
+                "fails": 0,
+                "name": "list users: status 200",
+                "path": "::list users: status 200"
+            },
+            "list users: valid json": {
+                "name": "list users: valid json",
+                "path": "::list users: valid json",
+                "id": "e10af7624c6e653d0f0194d912034737",
+                "passes": 1,
+                "fails": 0
+            },
+            "update user: status 200": {
+                "id": "0c5de14089b18abf74c26ee5769eb4ea",
+                "passes": 1,
+                "fails": 0,
+                "name": "update user: status 200",
+                "path": "::update user: status 200"
+            },
+            "update user: valid json": {
+                "name": "update user: valid json",
+                "path": "::update user: valid json",
+                "id": "ea292262fb620fda01fa7863fd149d49",
+                "passes": 1,
+                "fails": 0
+            },
+            "delete user: status 200": {
+                "id": "fc80a5ee55d1b8dcb3982653f5a0b790",
+                "passes": 1,
+                "fails": 0,
+                "name": "delete user: status 200",
+                "path": "::delete user: status 200"
+            },
+            "delete user: valid json": {
+                "fails": 0,
+                "name": "delete user: valid json",
+                "path": "::delete user: valid json",
+                "id": "261f2661f61a0a1f6bbff41777fcf2c3",
+                "passes": 1
+            }
+        },
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {}
+    }
+}
