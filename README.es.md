@@ -2,242 +2,113 @@
 
 <br/>
 
-<img src="docs/banner.png" alt="Nexgou Banner" width="100%" />
+<img src="docs/banner.png" alt="Banner de Nexgou" width="100%" />
 
-<h1>Nexgou</h1>
+# Nexgou
 
-<p><strong>Un framework Go progresivo para construir aplicaciones del lado del servidor eficientes, escalables y mantenibles.</strong></p>
+**Un framework Go progresivo para construir APIs HTTP rápidas, modulares y listas para producción.**
 
-<p><em>La claridad arquitectónica de NestJS — con la velocidad bruta de Go.</em></p>
+Claridad arquitectónica inspirada en NestJS, con rendimiento Go y despliegue simple.
 
 <br/>
 
-[![Go Version](https://img.shields.io/badge/Go-1.21%2B-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://golang.org)
-[![License](https://img.shields.io/badge/Licencia-MIT-22c55e?style=for-the-badge)](LICENSE)
-[![Status](https://img.shields.io/badge/Estado-WIP-f59e0b?style=for-the-badge)]()
+[![Go Version](https://img.shields.io/badge/Go-1.25%2B-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://golang.org)
+[![Licencia](https://img.shields.io/badge/Licencia-MIT-22c55e?style=for-the-badge)](LICENSE)
+[![Estado](https://img.shields.io/badge/Estado-WIP-f59e0b?style=for-the-badge)]()
 [![CI](https://img.shields.io/github/actions/workflow/status/nexgou/server/ci.yml?branch=main&style=for-the-badge&label=CI&logo=github-actions&logoColor=white)](https://github.com/nexgou/server/actions)
-[![GitHub](https://img.shields.io/badge/GitHub-nexgou%2Fserver-181717?style=for-the-badge&logo=github)](https://github.com/nexgou/server)
 
-<br/>
-
-> 🌐 &nbsp;[**English**](README.md) &nbsp;·&nbsp; [**Español**](README.es.md)
-
-<br/>
+[English](README.md) · [Español](README.es.md)
 
 </div>
 
 ---
 
-## ✨ Descripción General
+## Qué Es
 
-**Nexgou** es un framework Go de alto rendimiento e intencionado, inspirado en [NestJS](https://nestjs.com). Aporta una arquitectura modular y estructurada con inyección de dependencias de primera clase, guards e interceptores — todo desde un único import, sin sacrificar la velocidad de Go.
+Nexgou es un framework de aplicación para servicios HTTP en Go. Incluye módulos, inyección de dependencias, controladores, middleware, guards, interceptores, pipes, filtros, configuración, logger, helpers de testing y ejemplos preparados para benchmark.
 
-Go tiene excelentes librerías HTTP (Gin, Fiber, Echo) pero son principalmente **routers**. Nexgou es un **framework de aplicación completo** que te da todo lo necesario para construir APIs de producción desde el primer momento.
+Es para equipos que necesitan más que un router, sin perder la simplicidad ni el rendimiento de Go.
 
-<br/>
+## Para Qué Sirve
 
-<!-- Benchmark: wrk -t12 -c400 -d30s, endpoint JSON, Linux x86-64, Go 1.22 / Node 22, CPU 8 núcleos -->
+- Crear APIs REST con límites claros por dominio.
+- Mantener la lógica de negocio inyectable y testeable.
+- Aplicar auth, validación, logging, seguridad y errores de forma consistente.
+- Publicar servicios fáciles de medir, observar y evolucionar.
 
-<table>
-  <thead>
-    <tr>
-      <th align="left">Framework</th>
-      <th align="left">Lenguaje</th>
-      <th align="right">Req / seg</th>
-      <th align="right">Latencia media</th>
-      <th align="right">Latencia p99</th>
-      <th align="right">Memoria RSS</th>
-      <th align="center">Framework completo</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Nexgou</strong></td>
-      <td>Go 1.22</td>
-      <td align="right"><strong>🏆 221 800</strong></td>
-      <td align="right"><strong>🏆 1,80 ms</strong></td>
-      <td align="right"><strong>🏆 3,9 ms</strong></td>
-      <td align="right"><strong>🏆 11 MB</strong></td>
-      <td align="center">✅</td>
-    </tr>
-    <tr>
-      <td>Fiber v3</td>
-      <td>Go 1.22</td>
-      <td align="right">198 000</td>
-      <td align="right">2,02 ms</td>
-      <td align="right">5,8 ms</td>
-      <td align="right">14 MB</td>
-      <td align="center">❌ solo router</td>
-    </tr>
-    <tr>
-      <td>Gin v1</td>
-      <td>Go 1.22</td>
-      <td align="right">142 000</td>
-      <td align="right">2,81 ms</td>
-      <td align="right">7,4 ms</td>
-      <td align="right">12 MB</td>
-      <td align="center">❌ solo router</td>
-    </tr>
-    <tr>
-      <td>Echo v4</td>
-      <td>Go 1.22</td>
-      <td align="right">138 000</td>
-      <td align="right">2,90 ms</td>
-      <td align="right">7,9 ms</td>
-      <td align="right">13 MB</td>
-      <td align="center">❌ solo router</td>
-    </tr>
-    <tr>
-      <td>NestJS v10</td>
-      <td>Node 22</td>
-      <td align="right">28 500</td>
-      <td align="right">14,0 ms</td>
-      <td align="right">42 ms</td>
-      <td align="right">95 MB</td>
-      <td align="center">✅</td>
-    </tr>
-    <tr>
-      <td>Express v4</td>
-      <td>Node 22</td>
-      <td align="right">22 000</td>
-      <td align="right">18,2 ms</td>
-      <td align="right">55 ms</td>
-      <td align="right">72 MB</td>
-      <td align="center">❌ solo router</td>
-    </tr>
-    <tr>
-      <td>Spring Boot 3</td>
-      <td>Java 21 (JVM)</td>
-      <td align="right">61 000</td>
-      <td align="right">6,6 ms</td>
-      <td align="right">21 ms</td>
-      <td align="right">320 MB</td>
-      <td align="center">✅</td>
-    </tr>
-  </tbody>
-</table>
+## Ventajas
 
-<sub>
-  Benchmark: <code>wrk -t12 -c400 -d30s</code> · endpoint JSON <code>GET /users</code> · Linux x86-64 · CPU 8 núcleos · 16 GB RAM<br/>
-  Nexgou ejecutado con el pipeline de middleware completo (Recovery → SecurityHeaders → RateLimit → Logger).
-  Los routers se han medido con un handler mínimo <em>hello-world</em>.
-</sub>
+| Necesidad                 | Nexgou    | Stack típico basado en routers |
+| ------------------------- | --------- | ------------------------------ |
+| Módulos por dominio       | Incluido  | Convenciones manuales          |
+| Inyección de dependencias | Incluida  | Normalmente custom             |
+| Guards e interceptores    | Incluidos | Workarounds con middleware     |
+| Pipes y validación        | Incluidos | Código dentro del handler      |
+| Filtros de excepción      | Incluidos | Mapeo manual de errores        |
+| Config y logger           | Incluidos | Paquetes extra/globals         |
+| Helpers de testing        | Incluidos | Setup propio del proyecto      |
 
----
+Nexgou no intenta reemplazar routers pequeños para handlers mínimos. Está pensado para aplicaciones donde importan la estructura, los tests y los flujos repetibles.
 
-## ⚔️ ¿Por qué Nexgou frente a Gin, Fiber o Echo?
+## Benchmark
 
-Gin, Fiber y Echo son excelentes **routers**. Pero al construir una aplicación real sobre ellos terminas escribiendo el mismo boilerplate una y otra vez: un sistema de DI, un cargador de módulos, guards de autenticación, interceptores de peticiones, manejo centralizado de errores, un cargador de configuración, un logger… Nexgou incluye todo eso, completamente integrado y listo para producción.
+Los datos actuales están en [benchmark](benchmark) y [benchmark/RESULT_HTTP_PERFORMANCE.md](benchmark/RESULT_HTTP_PERFORMANCE.md).
 
-<table>
-  <thead>
-    <tr>
-      <th align="left">Capacidad</th>
-      <th align="center">Nexgou</th>
-      <th align="center">Gin</th>
-      <th align="center">Fiber</th>
-      <th align="center">Echo</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Sistema de módulos</strong> — organiza el código por dominio, no por tipo de fichero</td>
-      <td align="center">✅ incluido</td>
-      <td align="center">❌ manual</td>
-      <td align="center">❌ manual</td>
-      <td align="center">❌ manual</td>
-    </tr>
-    <tr>
-      <td><strong>Inyección de Dependencias</strong> — cableado automático de constructores, cero globals</td>
-      <td align="center">✅ incluido</td>
-      <td align="center">❌ manual</td>
-      <td align="center">❌ manual</td>
-      <td align="center">❌ manual</td>
-    </tr>
-    <tr>
-      <td><strong>Guards</strong> — lógica de auth/authz desacoplada de los handlers</td>
-      <td align="center">✅ incluido</td>
-      <td align="center">❌ solo middleware</td>
-      <td align="center">❌ solo middleware</td>
-      <td align="center">❌ solo middleware</td>
-    </tr>
-    <tr>
-      <td><strong>Interceptores</strong> — hooks pre/post handler por ruta</td>
-      <td align="center">✅ incluido</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-    </tr>
-    <tr>
-      <td><strong>Pipes</strong> — validación y transformación de entrada</td>
-      <td align="center">✅ incluido</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-    </tr>
-    <tr>
-      <td><strong>Filtros de Excepción</strong> — respuestas de error centralizadas y estructuradas</td>
-      <td align="center">✅ incluido</td>
-      <td align="center">❌ manual</td>
-      <td align="center">❌ manual</td>
-      <td align="center">❌ manual</td>
-    </tr>
-    <tr>
-      <td><strong>Suite de seguridad</strong> (cabeceras, CORS, rate limit, timeout, body limit)</td>
-      <td align="center">✅ incluido</td>
-      <td align="center">⚠️ 3rd party</td>
-      <td align="center">⚠️ 3rd party</td>
-      <td align="center">⚠️ 3rd party</td>
-    </tr>
-    <tr>
-      <td><strong>ConfigModule</strong> — acceso tipado e inyectable a variables de entorno</td>
-      <td align="center">✅ incluido</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-    </tr>
-    <tr>
-      <td><strong>LogModule</strong> — logger estructurado, JSON/texto, con scope por servicio</td>
-      <td align="center">✅ incluido</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-    </tr>
-    <tr>
-      <td><strong>Utilidades de testing</strong> — helpers unitarios e integración, sin configuración</td>
-      <td align="center">✅ incluido</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-      <td align="center">❌</td>
-    </tr>
-    <tr>
-      <td><strong>Versionado de rutas</strong> — <code>.Version("v1")</code> por ruta</td>
-      <td align="center">✅ incluido</td>
-      <td align="center">❌ prefijo manual</td>
-      <td align="center">❌ prefijo manual</td>
-      <td align="center">❌ prefijo manual</td>
-    </tr>
-  </tbody>
-</table>
+| Rank | Servicio      | Stack                    | Req/s prom. | p95 prom. | Errores |
+| ---: | ------------- | ------------------------ | ----------: | --------: | ------: |
+|    1 | `actix-web`   | Rust + Actix Web         |   21,788.89 |  15.37 ms |      0% |
+|    2 | `hyper`       | Rust + Hyper             |   21,453.22 |  15.10 ms |      0% |
+|    3 | `nexgou`      | Go + NexGou              |   20,102.40 |  16.84 ms |      0% |
+|    4 | `vert-x`      | Java + Vert.x Web        |   17,285.19 |  19.40 ms |      0% |
+|    5 | `asp-kestrel` | ASP.NET Core Minimal API |   16,124.23 |  26.59 ms |      0% |
+|    6 | `fastify`     | Node.js + Fastify        |    9,182.02 |  32.95 ms |      0% |
+|    7 | `ajax-php`    | PHP + PDO SQLite         |    2,384.51 |  84.85 ms |      0% |
 
-> **Conclusión:** con Gin, Fiber o Echo publicas un router y luego pasas semanas construyendo el framework de aplicación encima. Con Nexgou empiezas con el framework ya listo — y sigues obteniendo el rendimiento de Go.
+Entorno: Docker Compose en Windows, k6, 200 VUs, 30s por escenario, 4 CPU y 2 GB RAM por servicio.
 
----
-
-## 🚀 Instalación
+## Instalación
 
 ```bash
 go get github.com/nexgou/server
 ```
 
-> Requiere **Go 1.21** o superior.
+Requiere Go 1.25 o superior.
 
----
+## Módulos del Ecosistema
 
-## ⚡ Inicio Rápido
+Los módulos públicos están disponibles en la [organización nexgou en GitHub](https://github.com/orgs/nexgou/repositories). Los imports siguen el formato `github.com/nexgou/<modulo>`.
+
+| Módulo | Para qué sirve | Import |
+| --- | --- | --- |
+| [server](https://github.com/nexgou/server) | Framework principal | `github.com/nexgou/server` |
+| [caching](https://github.com/nexgou/caching) | Abstracción de caché | `github.com/nexgou/caching` |
+| [compression](https://github.com/nexgou/compression) | Compresión HTTP | `github.com/nexgou/compression` |
+| [cookie](https://github.com/nexgou/cookie) | Helpers de cookies | `github.com/nexgou/cookie` |
+| [cron](https://github.com/nexgou/cron) | Tareas programadas | `github.com/nexgou/cron` |
+| [database](https://github.com/nexgou/database) | Módulo base de base de datos | `github.com/nexgou/database` |
+| [events](https://github.com/nexgou/events) | Emisión de eventos | `github.com/nexgou/events` |
+| [fileupload](https://github.com/nexgou/fileupload) | Subida de archivos | `github.com/nexgou/fileupload` |
+| [graphql](https://github.com/nexgou/graphql) | Integración GraphQL | `github.com/nexgou/graphql` |
+| [grpc](https://github.com/nexgou/grpc) | Transporte gRPC | `github.com/nexgou/grpc` |
+| [jwt](https://github.com/nexgou/jwt) | Autenticación JWT | `github.com/nexgou/jwt` |
+| [mongo](https://github.com/nexgou/mongo) | Integración MongoDB | `github.com/nexgou/mongo` |
+| [mqtt](https://github.com/nexgou/mqtt) | Integración MQTT | `github.com/nexgou/mqtt` |
+| [nats](https://github.com/nexgou/nats) | Integración NATS | `github.com/nexgou/nats` |
+| [postgres](https://github.com/nexgou/postgres) | Integración PostgreSQL | `github.com/nexgou/postgres` |
+| [queues](https://github.com/nexgou/queues) | Abstracción de colas | `github.com/nexgou/queues` |
+| [rabbitmq](https://github.com/nexgou/rabbitmq) | Integración RabbitMQ | `github.com/nexgou/rabbitmq` |
+| [redis](https://github.com/nexgou/redis) | Integración Redis | `github.com/nexgou/redis` |
+| [scheduler](https://github.com/nexgou/scheduler) | Planificación de tareas | `github.com/nexgou/scheduler` |
+| [serialization](https://github.com/nexgou/serialization) | Helpers de serialización | `github.com/nexgou/serialization` |
+| [sqlite](https://github.com/nexgou/sqlite) | Integración SQLite | `github.com/nexgou/sqlite` |
+| [sqs](https://github.com/nexgou/sqs) | Integración AWS SQS | `github.com/nexgou/sqs` |
+| [streaming](https://github.com/nexgou/streaming) | Helpers de streaming | `github.com/nexgou/streaming` |
+| [validation](https://github.com/nexgou/validation) | Módulo de validación | `github.com/nexgou/validation` |
+| [websocket](https://github.com/nexgou/websocket) | Transporte WebSocket | `github.com/nexgou/websocket` |
+
+## Uso Rápido
 
 ```go
-// main.go
 package main
 
 import (
@@ -249,106 +120,55 @@ import (
     "github.com/nexgou/server/src/middleware"
 )
 
+var AppModule = nexgou.Module(nexgou.ModuleOptions{
+    Controllers: []any{NewUserController},
+})
+
+type UserController struct{}
+
+func NewUserController() *UserController { return &UserController{} }
+
+func (c *UserController) Register() []nexgou.Route {
+    return []nexgou.Route{
+        nexgou.Get("/users", c.FindAll).Version("v1"),
+    }
+}
+
+func (c *UserController) FindAll(ctx *nexgou.Context) error {
+    return ctx.JSON(200, nexgou.H{"users": []string{"alice", "bob"}})
+}
+
 func main() {
     app := nexgou.CreateApp(AppModule)
-
     app.Use(middleware.Recovery())
     app.Use(middleware.SecurityHeaders())
     app.Use(middleware.RateLimit(100, time.Minute))
-    app.Use(middleware.Logger())
     app.SetFilter(&filter.HttpExceptionFilter{})
 
     log.Fatal(app.Listen(3000))
 }
 ```
 
-```go
-// app.module.go
-var AppModule = nexgou.Module(nexgou.ModuleOptions{
-    Imports: []nexgou.IModule{nexgou.ConfigModule, nexgou.LogModule, UserModule},
-})
-```
+Puedes ver ejemplos completos en [samples/api](samples/api) y [samples/taskboard](samples/taskboard).
 
-```go
-// user/user.module.go
-var UserModule = nexgou.Module(nexgou.ModuleOptions{
-    Controllers: []any{NewUserController},
-    Providers:   []any{NewUserService},
-})
-```
+## Documentación
 
-```go
-// user/user.controller.go
-type UserController struct{ svc *UserService }
+- [Primeros pasos](docs/es/getting-started.md)
+- [Módulos](docs/es/modules.md)
+- [Controladores](docs/es/controllers.md)
+- [Middleware](docs/es/middleware.md)
+- [Seguridad](docs/es/security.md)
+- [Config](docs/es/config.md)
+- [Logger](docs/es/logger.md)
+- [Testing](docs/es/testing.md)
+- [Benchmark](docs/BENCHMARK.md)
 
-func NewUserController(s *UserService) *UserController { return &UserController{svc: s} }
+## Contribución
 
-func (c *UserController) Register() []nexgou.Route {
-    return []nexgou.Route{
-        nexgou.Get("/users",     c.FindAll).Version("v1"),
-        nexgou.Post("/users",    c.Create).Version("v1").Guard(&AuthGuard{}),
-        nexgou.Get("/users/:id", c.FindOne).Version("v1"),
-    }
-}
+Las contribuciones son bienvenidas. Lee [CONTRIBUTING.md](CONTRIBUTING.md) antes de abrir un pull request.
 
-func (c *UserController) FindAll(ctx *nexgou.Context) error { return ctx.JSON(200, c.svc.FindAll()) }
-func (c *UserController) Create(ctx *nexgou.Context) error  { return ctx.JSON(201, nexgou.H{"message": "creado"}) }
-func (c *UserController) FindOne(ctx *nexgou.Context) error { return ctx.JSON(200, c.svc.FindOne(ctx.Param("id"))) }
-```
+Para reportes de seguridad, usa [SECURITY.md](SECURITY.md).
 
-Consulta [`samples/api`](samples/api) para un ejemplo completo y funcional con todas las características activadas.
+## Licencia
 
----
-
-## 📚 Documentación
-
-| Guía                                         | Descripción                                                     |
-| :------------------------------------------- | :-------------------------------------------------------------- |
-| [Primeros Pasos](docs/es/getting-started.md) | Instalación, primera app, ciclo de arranque                     |
-| [Módulos](docs/es/modules.md)                | Sistema de módulos, módulos de funcionalidad, imports y exports |
-| [Controladores](docs/es/controllers.md)      | Rutas, versioning, guards, interceptores, pipes                 |
-| [Middleware](docs/es/middleware.md)          | Logger, Recovery, CORS y el pipeline completo                   |
-| [Seguridad](docs/es/security.md)             | Cabeceras de seguridad, rate limiting, timeout, body limit      |
-| [Config](docs/es/config.md)                  | `ConfigService`, acceso tipado a variables de entorno           |
-| [Logger](docs/es/logger.md)                  | `LoggerService`, niveles, loggers con scope, salida JSON        |
-| [Testing](docs/es/testing.md)                | Helpers unitarios e integración de `nexgoutest`                 |
-
----
-
-## 🗂 Ejemplos
-
-| Ejemplo                      | Transportes | Características demostradas                              |
-| :--------------------------- | :---------: | :------------------------------------------------------- |
-| [`samples/api`](samples/api) |    HTTP     | Pipeline completo, guards, interceptores, DI, versioning |
-
----
-
-## 🗺 Hoja de Ruta
-
-<details>
-<summary><strong>Core (completado)</strong></summary>
-
-- [x] Motor HTTP y contexto
-- [x] Sistema de módulos y contenedor IoC
-- [x] Resolución de Inyección de Dependencias
-- [x] Controladores y enrutamiento declarativo
-- [x] Pipeline de middleware (global y con scope)
-- [x] Guards, Interceptores, Pipes
-- [x] Filtros de Excepción
-- [x] `ConfigModule` y `LogModule`
-- [x] `nexgoutest` — helpers de test unitarios e integración
-- [x] Suite de middleware de seguridad (cabeceras, CORS, rate limit, timeout, body limit)
-
-</details>
-
----
-
-## 🤝 Contribuir
-
-¡Las contribuciones son bienvenidas! Lee [CONTRIBUTING.md](CONTRIBUTING.md) antes de enviar un pull request. Para reportar vulnerabilidades de seguridad consulta [SECURITY.md](SECURITY.md).
-
----
-
-## 📄 Licencia
-
-Nexgou tiene [licencia MIT](LICENSE).
+Nexgou se publica bajo la [Licencia MIT](LICENSE).
