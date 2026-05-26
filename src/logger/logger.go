@@ -18,7 +18,22 @@ const (
 	LevelInfo
 	LevelWarn
 	LevelError
+	LevelSilent
 )
+
+// Format represents the logger output format.
+type Format int
+
+const (
+	FormatText Format = iota
+	FormatJSON
+)
+
+// LoggerOptions configures a logger instance without reading environment variables.
+type LoggerOptions struct {
+	Level  Level
+	Format Format
+}
 
 func (l Level) String() string {
 	switch l {
@@ -30,9 +45,33 @@ func (l Level) String() string {
 		return "WARN"
 	case LevelError:
 		return "ERROR"
+	case LevelSilent:
+		return "SILENT"
 	default:
 		return "INFO"
 	}
+}
+
+func ParseLoggerLevel(value string) Level {
+	switch value {
+	case "debug":
+		return LevelDebug
+	case "warn":
+		return LevelWarn
+	case "error":
+		return LevelError
+	case "silent":
+		return LevelSilent
+	default:
+		return LevelInfo
+	}
+}
+
+func ParseLoggerFormat(value string) Format {
+	if value == "json" {
+		return FormatJSON
+	}
+	return FormatText
 }
 
 // levelColor returns the ANSI color for a log level.
@@ -72,19 +111,23 @@ type LoggerService struct {
 // Format and level are resolved from environment variables at creation time.
 func NewLoggerService() *LoggerService {
 	l := &LoggerService{}
-	l.json = os.Getenv("LOG_FORMAT") == "json"
-
-	switch os.Getenv("LOG_LEVEL") {
-	case "debug":
-		l.minLevel = LevelDebug
-	case "warn":
-		l.minLevel = LevelWarn
-	case "error":
-		l.minLevel = LevelError
-	default:
-		l.minLevel = LevelInfo
-	}
+	l.json = ParseLoggerFormat(os.Getenv("LOG_FORMAT")) == FormatJSON
+	l.minLevel = ParseLoggerLevel(os.Getenv("LOG_LEVEL"))
 	return l
+}
+
+// NewLogger creates a LoggerService from explicit options.
+func NewLogger(options ...LoggerOptions) *LoggerService {
+	opt := LoggerOptions{Level: LevelInfo, Format: FormatText}
+	if len(options) > 0 {
+		opt = options[0]
+	}
+	return &LoggerService{minLevel: opt.Level, json: opt.Format == FormatJSON}
+}
+
+// Enabled reports whether the given level would be written.
+func (l *LoggerService) Enabled(level Level) bool {
+	return l.minLevel != LevelSilent && level >= l.minLevel
 }
 
 // WithContext returns a ScopedLogger that prefixes every message with name.
@@ -110,7 +153,7 @@ func (l *LoggerService) Error(msg string, args ...any) { l.log(LevelError, "", m
 
 // log is the central write method.
 func (l *LoggerService) log(level Level, context, msg string, args []any) {
-	if level < l.minLevel {
+	if !l.Enabled(level) {
 		return
 	}
 	if l.json {
