@@ -75,9 +75,6 @@ func routeBadges(route router.RouteInfo) string {
 	} else {
 		badges = append(badges, "guards: "+strings.Join(route.Guards, ", "))
 	}
-	if len(route.Pipes) > 0 {
-		badges = append(badges, "pipes: "+strings.Join(route.Pipes, ", "))
-	}
 	if len(route.Interceptors) > 0 {
 		badges = append(badges, "interceptors: "+strings.Join(route.Interceptors, ", "))
 	}

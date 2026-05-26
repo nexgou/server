@@ -74,7 +74,6 @@ func BenchmarkRouterFullPipeline(b *testing.B) {
 	})
 	router.Add(common.Route{Method: http.MethodGet, Path: "/tasks/:id", Handler: benchmarkHandler}.
 		Guard(benchmarkGuard{}).
-		Pipe(benchmarkPipe{}).
 		Intercept(benchmarkInterceptor{}))
 
 	runRouterBenchmark(b, router, http.MethodGet, "/tasks/123")
@@ -84,12 +83,6 @@ type benchmarkGuard struct{}
 
 func (guard benchmarkGuard) CanActivate(ctx *common.Context) (bool, error) {
 	return true, nil
-}
-
-type benchmarkPipe struct{}
-
-func (pipe benchmarkPipe) Transform(value string) (any, error) {
-	return value, nil
 }
 
 type benchmarkInterceptor struct{}

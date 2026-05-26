@@ -8,17 +8,13 @@ import (
 
 	"github.com/nexgou/server/src/common"
 	"github.com/nexgou/server/src/core"
-	nexgougrpc "github.com/nexgou/server/src/grpc"
 	"github.com/nexgou/server/src/router"
-	nexgouws "github.com/nexgou/server/src/websocket"
 )
 
 // App is the Nexgou application instance. It holds the router, exposes
-// the top-level configuration API (Use, SetFilter, Listen), and can
-// optionally start a gRPC server alongside the HTTP server.
+// the top-level configuration API (Use, SetFilter, Listen), and serves HTTP.
 type App struct {
-	router     *router.Router
-	grpcServer *nexgougrpc.GRPCServer
+	router *router.Router
 }
 
 // CreateApp initializes a Nexgou application from a root module.
@@ -85,21 +81,6 @@ func (a *App) Listen(port int, ip ...string) error {
 	return http.ListenAndServe(addr, a.router)
 }
 
-// ListenGRPC starts a gRPC server on the given port (default host 0.0.0.0).
-// It must be called from a separate goroutine when combined with Listen:
-//
-//	go app.ListenGRPC(50051)
-//	app.Listen(3000)
-//
-// Returns an error if the port cannot be bound or if no gRPC controllers were
-// registered in the module tree (the gRPC server would be empty).
-func (a *App) ListenGRPC(port int, ip ...string) error {
-	if a.grpcServer == nil {
-		return fmt.Errorf("nexgou: ListenGRPC called but no GRPCController was registered in the module tree")
-	}
-	return a.grpcServer.Listen(port, ip...)
-}
-
 // Handler returns the underlying http.Handler so the app can be mounted on
 // a custom server (e.g. httptest.Server for integration tests).
 func (a *App) Handler() http.Handler {
@@ -159,22 +140,6 @@ func (a *App) printRoutes() {
 		fmt.Printf("%s%s%s   %s%s%s   %s\n", color, method, reset, dim, path, reset, badge)
 	}
 
-	// Print WebSocket routes.
-	wsRoutes := a.router.WSRoutes()
-	if len(wsRoutes) > 0 {
-		cyan := "\033[36m"
-		for _, r := range wsRoutes {
-			badge := ""
-			if len(r.Guards) == 0 {
-				badge = fmt.Sprintf("%s🌐 public%s", gray, reset)
-			} else {
-				badge = fmt.Sprintf("🔒 %s%s%s", dim, strings.Join(r.Guards, ", "), reset)
-			}
-			wspath := fmt.Sprintf("%-*s", maxPath, r.Path)
-			fmt.Printf("%sWS    %s   %s%s%s   %s\n", cyan, reset, dim, wspath, reset, badge)
-		}
-	}
-
 	fmt.Println()
 }
 
@@ -220,22 +185,5 @@ func (a *App) walkModule(m common.IModule, c *core.Container) {
 			a.router.Add(route)
 		}
 
-		// If the controller also implements WSController, register its WS routes.
-		if wsCtrl, ok := val.Interface().(nexgouws.WSController); ok {
-			for _, route := range wsCtrl.RegisterWS() {
-				a.router.AddWS(route)
-			}
-		}
-
-		// If the controller also implements GRPCController, register its gRPC services.
-		if grpcCtrl, ok := val.Interface().(nexgougrpc.GRPCController); ok {
-			if a.grpcServer == nil {
-				a.grpcServer = nexgougrpc.NewGRPCServer()
-			}
-			grpcRoutes := grpcCtrl.RegisterGRPC()
-			for i := range grpcRoutes {
-				a.grpcServer.RegisterRoute(grpcRoutes[i])
-			}
-		}
 	}
 }
