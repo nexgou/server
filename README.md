@@ -50,6 +50,31 @@ It is for teams that want more than a router, but still want Go's simplicity and
 
 Nexgou is not trying to replace small routers for tiny handlers. It is for applications where structure, testing, and repeated workflows matter.
 
+## Diferencias frente a competidores directos
+
+Esta tabla resume donde Nexgou busca diferenciarse: no competir solo como router, sino como framework de aplicacion completo para Go, con una DX cercana a NestJS y una base de rendimiento cercana al ecosistema Go/fasthttp.
+
+Leyenda: `✅` incluido o enfoque principal, `⚠️` disponible parcialmente o mediante patrones externos, `❌` no es parte central del framework.
+
+| Capacidad / criterio                       | Nexgou<br/>Go | Actix Web<br/>Rust | Vert.x<br/>Java | Fastify<br/>JS/TS | ASP.NET Core<br/>C# | FastAPI<br/>Python | Laravel Octane<br/>PHP |
+| ------------------------------------------ | :-----------: | :----------------: | :-------------: | :---------------: | :-----------------: | :----------------: | :--------------------: |
+| Framework de aplicacion, no solo router    |      ✅       |         ✅         |       ⚠️        |        ⚠️         |         ✅          |         ✅         |           ✅           |
+| Sistema de modulos por dominio             |      ✅       |         ⚠️         |       ✅        |        ⚠️         |         ✅          |         ⚠️         |           ✅           |
+| Inyeccion de dependencias integrada        |      ✅       |         ❌         |       ⚠️        |        ❌         |         ✅          |         ✅         |           ✅           |
+| Guards / autorizacion por ruta             |      ✅       |         ⚠️         |       ⚠️        |        ⚠️         |         ✅          |         ✅         |           ✅           |
+| Interceptors antes/despues del handler     |      ✅       |         ⚠️         |       ⚠️        |        ⚠️         |         ✅          |         ⚠️         |           ✅           |
+| Pipes de validacion y transformacion       |      ✅       |         ⚠️         |       ⚠️        |        ✅         |         ⚠️          |         ✅         |           ✅           |
+| Filtros de excepciones centralizados       |      ✅       |         ⚠️         |       ⚠️        |        ⚠️         |         ✅          |         ✅         |           ✅           |
+| Configuracion inyectable                   |      ✅       |         ⚠️         |       ⚠️        |        ⚠️         |         ✅          |         ✅         |           ✅           |
+| Logger estructurado integrado              |      ✅       |         ⚠️         |       ✅        |        ✅         |         ✅          |         ⚠️         |           ✅           |
+| Middleware de seguridad incluido           |      ✅       |         ⚠️         |       ⚠️        |        ⚠️         |         ✅          |         ⚠️         |           ✅           |
+| Testing helpers del framework              |      ✅       |         ⚠️         |       ⚠️        |        ⚠️         |         ✅          |         ✅         |           ✅           |
+| Versionado de rutas                        |      ✅       |         ⚠️         |       ⚠️        |        ⚠️         |         ✅          |         ⚠️         |           ✅           |
+| Adapter `fasthttp` orientado a performance |      ✅       |         ❌         |       ❌        |        ❌         |         ❌          |         ❌         |           ❌           |
+| Binario simple y despliegue directo        |      ✅       |         ✅         |       ❌        |        ❌         |         ✅          |         ❌         |           ❌           |
+
+Lectura rapida: Nexgou intenta ocupar un espacio intermedio entre routers ligeros y frameworks enterprise: arquitectura de framework completo, ergonomia inspirada en NestJS y rendimiento Go con adapter `fasthttp`.
+
 ## Benchmark Snapshot
 
 Current benchmark data lives in [benchmark](benchmark) and [benchmark/RESULT_HTTP_PERFORMANCE.md](benchmark/RESULT_HTTP_PERFORMANCE.md).
@@ -78,33 +103,33 @@ Requires Go 1.25 or newer.
 
 Public modules are available from the [nexgou GitHub organization](https://github.com/orgs/nexgou/repositories). Import paths follow `github.com/nexgou/<module>`.
 
-| Module | Purpose | Import |
-| --- | --- | --- |
-| [server](https://github.com/nexgou/server) | Core framework | `github.com/nexgou/server` |
-| [caching](https://github.com/nexgou/caching) | Cache abstraction | `github.com/nexgou/caching` |
-| [compression](https://github.com/nexgou/compression) | HTTP compression | `github.com/nexgou/compression` |
-| [cookie](https://github.com/nexgou/cookie) | Cookie helpers | `github.com/nexgou/cookie` |
-| [cron](https://github.com/nexgou/cron) | Scheduled jobs | `github.com/nexgou/cron` |
-| [database](https://github.com/nexgou/database) | Database base module | `github.com/nexgou/database` |
-| [events](https://github.com/nexgou/events) | Event emitter | `github.com/nexgou/events` |
-| [fileupload](https://github.com/nexgou/fileupload) | File uploads | `github.com/nexgou/fileupload` |
-| [graphql](https://github.com/nexgou/graphql) | GraphQL integration | `github.com/nexgou/graphql` |
-| [grpc](https://github.com/nexgou/grpc) | gRPC transport | `github.com/nexgou/grpc` |
-| [jwt](https://github.com/nexgou/jwt) | JWT auth | `github.com/nexgou/jwt` |
-| [mongo](https://github.com/nexgou/mongo) | MongoDB integration | `github.com/nexgou/mongo` |
-| [mqtt](https://github.com/nexgou/mqtt) | MQTT integration | `github.com/nexgou/mqtt` |
-| [nats](https://github.com/nexgou/nats) | NATS integration | `github.com/nexgou/nats` |
-| [postgres](https://github.com/nexgou/postgres) | PostgreSQL integration | `github.com/nexgou/postgres` |
-| [queues](https://github.com/nexgou/queues) | Queue abstraction | `github.com/nexgou/queues` |
-| [rabbitmq](https://github.com/nexgou/rabbitmq) | RabbitMQ integration | `github.com/nexgou/rabbitmq` |
-| [redis](https://github.com/nexgou/redis) | Redis integration | `github.com/nexgou/redis` |
-| [scheduler](https://github.com/nexgou/scheduler) | Task scheduling | `github.com/nexgou/scheduler` |
-| [serialization](https://github.com/nexgou/serialization) | Serialization helpers | `github.com/nexgou/serialization` |
-| [sqlite](https://github.com/nexgou/sqlite) | SQLite integration | `github.com/nexgou/sqlite` |
-| [sqs](https://github.com/nexgou/sqs) | AWS SQS integration | `github.com/nexgou/sqs` |
-| [streaming](https://github.com/nexgou/streaming) | Streaming helpers | `github.com/nexgou/streaming` |
-| [validation](https://github.com/nexgou/validation) | Validation module | `github.com/nexgou/validation` |
-| [websocket](https://github.com/nexgou/websocket) | WebSocket transport | `github.com/nexgou/websocket` |
+| Module                                                   | Purpose                | Import                            |
+| -------------------------------------------------------- | ---------------------- | --------------------------------- |
+| [server](https://github.com/nexgou/server)               | Core framework         | `github.com/nexgou/server`        |
+| [caching](https://github.com/nexgou/caching)             | Cache abstraction      | `github.com/nexgou/caching`       |
+| [compression](https://github.com/nexgou/compression)     | HTTP compression       | `github.com/nexgou/compression`   |
+| [cookie](https://github.com/nexgou/cookie)               | Cookie helpers         | `github.com/nexgou/cookie`        |
+| [cron](https://github.com/nexgou/cron)                   | Scheduled jobs         | `github.com/nexgou/cron`          |
+| [database](https://github.com/nexgou/database)           | Database base module   | `github.com/nexgou/database`      |
+| [events](https://github.com/nexgou/events)               | Event emitter          | `github.com/nexgou/events`        |
+| [fileupload](https://github.com/nexgou/fileupload)       | File uploads           | `github.com/nexgou/fileupload`    |
+| [graphql](https://github.com/nexgou/graphql)             | GraphQL integration    | `github.com/nexgou/graphql`       |
+| [grpc](https://github.com/nexgou/grpc)                   | gRPC transport         | `github.com/nexgou/grpc`          |
+| [jwt](https://github.com/nexgou/jwt)                     | JWT auth               | `github.com/nexgou/jwt`           |
+| [mongo](https://github.com/nexgou/mongo)                 | MongoDB integration    | `github.com/nexgou/mongo`         |
+| [mqtt](https://github.com/nexgou/mqtt)                   | MQTT integration       | `github.com/nexgou/mqtt`          |
+| [nats](https://github.com/nexgou/nats)                   | NATS integration       | `github.com/nexgou/nats`          |
+| [postgres](https://github.com/nexgou/postgres)           | PostgreSQL integration | `github.com/nexgou/postgres`      |
+| [queues](https://github.com/nexgou/queues)               | Queue abstraction      | `github.com/nexgou/queues`        |
+| [rabbitmq](https://github.com/nexgou/rabbitmq)           | RabbitMQ integration   | `github.com/nexgou/rabbitmq`      |
+| [redis](https://github.com/nexgou/redis)                 | Redis integration      | `github.com/nexgou/redis`         |
+| [scheduler](https://github.com/nexgou/scheduler)         | Task scheduling        | `github.com/nexgou/scheduler`     |
+| [serialization](https://github.com/nexgou/serialization) | Serialization helpers  | `github.com/nexgou/serialization` |
+| [sqlite](https://github.com/nexgou/sqlite)               | SQLite integration     | `github.com/nexgou/sqlite`        |
+| [sqs](https://github.com/nexgou/sqs)                     | AWS SQS integration    | `github.com/nexgou/sqs`           |
+| [streaming](https://github.com/nexgou/streaming)         | Streaming helpers      | `github.com/nexgou/streaming`     |
+| [validation](https://github.com/nexgou/validation)       | Validation module      | `github.com/nexgou/validation`    |
+| [websocket](https://github.com/nexgou/websocket)         | WebSocket transport    | `github.com/nexgou/websocket`     |
 
 ## Quick Start
 
