@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/nexgou/server/src/common"
+	"github.com/nexgou/server/src/middleware"
 	"github.com/nexgou/server/src/router"
 )
 
@@ -199,6 +200,41 @@ func TestRouter_Middleware(t *testing.T) {
 
 	if len(order) != 3 || order[0] != "before" || order[1] != "handler" || order[2] != "after" {
 		t.Errorf("middleware order: %v", order)
+	}
+}
+
+func TestRouter_OptionsNotFound_WithCorsMiddleware(t *testing.T) {
+	r := router.New()
+	r.Use(middleware.CorsWithOptions(middleware.CorsOptions{}))
+
+	req := httptest.NewRequest(http.MethodOptions, "/skills", nil)
+	req.Header.Set("Origin", "http://localhost:3000")
+	req.Header.Set("Access-Control-Request-Method", http.MethodPost)
+	req.Header.Set("Access-Control-Request-Headers", "content-type")
+	w := httptest.NewRecorder()
+
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusNoContent {
+		t.Fatalf("OPTIONS with CORS middleware: got %d, want 204", w.Code)
+	}
+	if got := w.Header().Get("Access-Control-Allow-Origin"); got != "*" {
+		t.Fatalf("allow origin: got %q, want *", got)
+	}
+	if got := w.Header().Get("Access-Control-Allow-Methods"); got == "" {
+		t.Fatal("expected Access-Control-Allow-Methods header")
+	}
+}
+
+func TestRouter_OptionsNotFound_WithoutMiddleware(t *testing.T) {
+	r := router.New()
+	req := httptest.NewRequest(http.MethodOptions, "/skills", nil)
+	w := httptest.NewRecorder()
+
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusNotFound {
+		t.Fatalf("OPTIONS without middleware: got %d, want 404", w.Code)
 	}
 }
 

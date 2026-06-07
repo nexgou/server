@@ -19,6 +19,21 @@ type entry struct {
 	hasParams       bool
 }
 
+type responseWriteTracker struct {
+	http.ResponseWriter
+	written bool
+}
+
+func (t *responseWriteTracker) Write(b []byte) (int, error) {
+	t.written = true
+	return t.ResponseWriter.Write(b)
+}
+
+func (t *responseWriteTracker) WriteHeader(statusCode int) {
+	t.written = true
+	t.ResponseWriter.WriteHeader(statusCode)
+}
+
 // Router handles HTTP routing with support for parameterized path segments (:param).
 type Router struct {
 	entries        []entry
@@ -114,6 +129,32 @@ func (r *Router) SetFilter(f common.ExceptionFilter) {
 	r.filter = f
 }
 
+func (r *Router) applyMiddlewares(handler common.HandlerFunc) common.HandlerFunc {
+	for i := len(r.middlewares) - 1; i >= 0; i-- {
+		handler = r.middlewares[i](handler)
+	}
+	return handler
+}
+
+func (r *Router) tryOptionsWithMiddleware(w http.ResponseWriter, req *http.Request) bool {
+	if req.Method != http.MethodOptions {
+		return false
+	}
+
+	tracker := &responseWriteTracker{ResponseWriter: w}
+	ctx := common.NewContext(tracker, req, nil)
+	handler := r.applyMiddlewares(func(ctx *common.Context) error {
+		return nil
+	})
+
+	if err := handler(ctx); err != nil {
+		r.handleError(err, ctx, tracker)
+		return true
+	}
+
+	return tracker.written
+}
+
 // ServeHTTP implements http.Handler.
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var matched *entry
@@ -141,7 +182,9 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if matched == nil && len(r.dynamicEntries) == 0 && !strings.HasSuffix(req.URL.Path, "/") {
-		r.writeNotFound(w, req)
+		if !r.tryOptionsWithMiddleware(w, req) {
+			r.writeNotFound(w, req)
+		}
 		return
 	}
 
@@ -177,7 +220,9 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if matched == nil {
-		r.writeNotFound(w, req)
+		if !r.tryOptionsWithMiddleware(w, req) {
+			r.writeNotFound(w, req)
+		}
 		return
 	}
 
@@ -237,10 +282,7 @@ func (r *Router) compileHandler(e entry) common.HandlerFunc {
 		}
 	}
 
-	for i := len(r.middlewares) - 1; i >= 0; i-- {
-		handler = r.middlewares[i](handler)
-	}
-	return handler
+	return r.applyMiddlewares(handler)
 }
 
 // handleError dispatches an error to the exception filter or falls back to plain HTTP errors.
