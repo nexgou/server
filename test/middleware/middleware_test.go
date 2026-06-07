@@ -96,6 +96,89 @@ func TestCors_ExposedHeaders(t *testing.T) {
 	}
 }
 
+func TestCors_WildcardWithCredentials_ReflectsOrigin(t *testing.T) {
+	mw := middleware.CorsWithOptions(middleware.CorsOptions{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+	})
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.Header.Set("Origin", "https://app.example.com")
+	w := applyMW(mw, req)
+
+	if got := w.Header().Get("Access-Control-Allow-Origin"); got != "https://app.example.com" {
+		t.Fatalf("allow origin: got %q, want reflected origin", got)
+	}
+	if got := w.Header().Get("Access-Control-Allow-Credentials"); got != "true" {
+		t.Fatalf("allow credentials: got %q, want true", got)
+	}
+}
+
+func TestCors_Preflight_MethodNotAllowed(t *testing.T) {
+	mw := middleware.CorsWithOptions(middleware.CorsOptions{
+		AllowedMethods: []string{"GET"},
+	})
+	req := httptest.NewRequest(http.MethodOptions, "/", nil)
+	req.Header.Set("Origin", "https://example.com")
+	req.Header.Set("Access-Control-Request-Method", "DELETE")
+	w := applyMW(mw, req)
+
+	if w.Code != http.StatusNoContent {
+		t.Fatalf("preflight method not allowed: got %d, want 204", w.Code)
+	}
+	if got := w.Header().Get("Access-Control-Allow-Methods"); got != "" {
+		t.Fatalf("expected no allow-methods header, got %q", got)
+	}
+}
+
+func TestCors_Preflight_HeadersNotAllowed(t *testing.T) {
+	mw := middleware.CorsWithOptions(middleware.CorsOptions{
+		AllowedHeaders: []string{"Content-Type"},
+	})
+	req := httptest.NewRequest(http.MethodOptions, "/", nil)
+	req.Header.Set("Origin", "https://example.com")
+	req.Header.Set("Access-Control-Request-Method", "POST")
+	req.Header.Set("Access-Control-Request-Headers", "X-Token")
+	w := applyMW(mw, req)
+
+	if w.Code != http.StatusNoContent {
+		t.Fatalf("preflight headers not allowed: got %d, want 204", w.Code)
+	}
+	if got := w.Header().Get("Access-Control-Allow-Headers"); got != "" {
+		t.Fatalf("expected no allow-headers header, got %q", got)
+	}
+}
+
+func TestCors_Preflight_HeadersAllowedCaseInsensitive(t *testing.T) {
+	mw := middleware.CorsWithOptions(middleware.CorsOptions{
+		AllowedHeaders: []string{"content-type", "x-api-key"},
+	})
+	req := httptest.NewRequest(http.MethodOptions, "/", nil)
+	req.Header.Set("Origin", "https://example.com")
+	req.Header.Set("Access-Control-Request-Method", "POST")
+	req.Header.Set("Access-Control-Request-Headers", "Content-Type, X-Api-Key")
+	w := applyMW(mw, req)
+
+	if w.Code != http.StatusNoContent {
+		t.Fatalf("preflight allowed headers: got %d, want 204", w.Code)
+	}
+	if got := w.Header().Get("Access-Control-Allow-Headers"); got == "" {
+		t.Fatal("expected allow-headers header")
+	}
+}
+
+func TestCors_Preflight_MaxAgeNegative_OmitsHeader(t *testing.T) {
+	mw := middleware.CorsWithOptions(middleware.CorsOptions{
+		MaxAge: -1,
+	})
+	req := httptest.NewRequest(http.MethodOptions, "/", nil)
+	req.Header.Set("Access-Control-Request-Method", "GET")
+	w := applyMW(mw, req)
+
+	if got := w.Header().Get("Access-Control-Max-Age"); got != "" {
+		t.Fatalf("expected no Access-Control-Max-Age, got %q", got)
+	}
+}
+
 // ── Security Headers ──────────────────────────────────────────────────────────
 
 func TestSecurityHeaders_Defaults(t *testing.T) {

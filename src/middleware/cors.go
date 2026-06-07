@@ -66,6 +66,8 @@ func CorsWithOptions(opts CorsOptions) common.MiddlewareFunc {
 	headers := strings.Join(opts.AllowedHeaders, ", ")
 	exposed := strings.Join(opts.ExposedHeaders, ", ")
 	maxAge := strconv.Itoa(opts.MaxAge)
+	allowedMethods := toTokenSet(opts.AllowedMethods)
+	allowedHeaders := toTokenSet(opts.AllowedHeaders)
 
 	return func(next common.HandlerFunc) common.HandlerFunc {
 		return func(ctx *common.Context) error {
@@ -73,7 +75,13 @@ func CorsWithOptions(opts CorsOptions) common.MiddlewareFunc {
 			origin := ctx.Request.Header.Get("Origin")
 
 			// Determine the effective allowed origin for this request
-			if isWildcard {
+			if isWildcard && opts.AllowCredentials {
+				// Browsers reject wildcard origin with credentials. Reflect origin instead.
+				if origin != "" {
+					h.Set("Access-Control-Allow-Origin", origin)
+					h.Add("Vary", "Origin")
+				}
+			} else if isWildcard {
 				h.Set("Access-Control-Allow-Origin", "*")
 			} else if origin != "" && originAllowed(origin, opts.AllowedOrigins) {
 				h.Set("Access-Control-Allow-Origin", origin)
@@ -89,6 +97,24 @@ func CorsWithOptions(opts CorsOptions) common.MiddlewareFunc {
 
 			// Preflight
 			if ctx.Request.Method == http.MethodOptions {
+				reqMethod := ctx.Request.Header.Get("Access-Control-Request-Method")
+				if reqMethod != "" {
+					h.Add("Vary", "Access-Control-Request-Method")
+				}
+				if !methodAllowed(reqMethod, allowedMethods) {
+					ctx.Writer.WriteHeader(http.StatusNoContent)
+					return nil
+				}
+
+				reqHeaders := ctx.Request.Header.Get("Access-Control-Request-Headers")
+				if reqHeaders != "" {
+					h.Add("Vary", "Access-Control-Request-Headers")
+				}
+				if !headersAllowed(reqHeaders, allowedHeaders) {
+					ctx.Writer.WriteHeader(http.StatusNoContent)
+					return nil
+				}
+
 				h.Set("Access-Control-Allow-Methods", methods)
 				h.Set("Access-Control-Allow-Headers", headers)
 				if opts.MaxAge > 0 {
@@ -111,4 +137,45 @@ func originAllowed(origin string, allowed []string) bool {
 		}
 	}
 	return false
+}
+
+func toTokenSet(values []string) map[string]struct{} {
+	set := make(map[string]struct{}, len(values))
+	for _, v := range values {
+		t := strings.ToLower(strings.TrimSpace(v))
+		if t == "" {
+			continue
+		}
+		set[t] = struct{}{}
+	}
+	return set
+}
+
+func methodAllowed(requested string, allowed map[string]struct{}) bool {
+	requested = strings.ToLower(strings.TrimSpace(requested))
+	if requested == "" {
+		return true
+	}
+	_, ok := allowed[requested]
+	return ok
+}
+
+func headersAllowed(requested string, allowed map[string]struct{}) bool {
+	requested = strings.TrimSpace(requested)
+	if requested == "" {
+		return true
+	}
+	if _, ok := allowed["*"]; ok {
+		return true
+	}
+	for _, h := range strings.Split(requested, ",") {
+		token := strings.ToLower(strings.TrimSpace(h))
+		if token == "" {
+			continue
+		}
+		if _, ok := allowed[token]; !ok {
+			return false
+		}
+	}
+	return true
 }
