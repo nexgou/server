@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/nexgou/server/src/common"
@@ -16,9 +17,15 @@ import (
 // Usage:
 //
 //	app.Use(middleware.Timeout(30 * time.Second))
+// Timeout returns a global middleware that cancels the request context after d.
+// WebSocket upgrade requests are exempt — they are long-lived connections and
+// must not be subject to a short HTTP request deadline.
 func Timeout(d time.Duration) common.MiddlewareFunc {
 	return func(next common.HandlerFunc) common.HandlerFunc {
 		return func(ctx *common.Context) error {
+			if strings.EqualFold(ctx.Request.Header.Get("Upgrade"), "websocket") {
+				return next(ctx)
+			}
 			return runWithTimeout(ctx, d, next)
 		}
 	}
