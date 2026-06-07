@@ -38,15 +38,15 @@ app.Use(middleware.SecurityHeaders(middleware.SecurityOptions{
 
 ### SecurityOptions fields
 
-| Field | Default | Description |
-|---|---|---|
-| `ContentSecurityPolicy` | `default-src 'self'` | Controls which resources the browser may load |
-| `XFrameOptions` | `DENY` | Prevents clickjacking via `<iframe>` embedding |
-| `XContentTypeOptions` | `nosniff` | Prevents MIME-type sniffing |
-| `XXSSProtection` | `1; mode=block` | Enables browser XSS filter (legacy browsers) |
-| `StrictTransportSecurity` | `max-age=31536000; includeSubDomains` | Forces HTTPS for 1 year |
-| `ReferrerPolicy` | `strict-origin-when-cross-origin` | Controls the `Referer` header |
-| `PermissionsPolicy` | `geolocation=(), microphone=(), camera=()` | Restricts browser feature access |
+| Field                     | Default                                    | Description                                    |
+| ------------------------- | ------------------------------------------ | ---------------------------------------------- |
+| `ContentSecurityPolicy`   | `default-src 'self'`                       | Controls which resources the browser may load  |
+| `XFrameOptions`           | `DENY`                                     | Prevents clickjacking via `<iframe>` embedding |
+| `XContentTypeOptions`     | `nosniff`                                  | Prevents MIME-type sniffing                    |
+| `XXSSProtection`          | `1; mode=block`                            | Enables browser XSS filter (legacy browsers)   |
+| `StrictTransportSecurity` | `max-age=31536000; includeSubDomains`      | Forces HTTPS for 1 year                        |
+| `ReferrerPolicy`          | `strict-origin-when-cross-origin`          | Controls the `Referer` header                  |
+| `PermissionsPolicy`       | `geolocation=(), microphone=(), camera=()` | Restricts browser feature access               |
 
 Set any field to `"-"` to omit that header entirely.
 
@@ -79,16 +79,22 @@ app.Use(middleware.CorsWithOptions(middleware.CorsOptions{
 
 ### CorsOptions fields
 
-| Field | Default | Description |
-|---|---|---|
-| `AllowedOrigins` | `["*"]` | Origins allowed to make cross-origin requests |
-| `AllowedMethods` | `GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS` | Allowed HTTP methods |
-| `AllowedHeaders` | `Content-Type, Authorization` | Allowed request headers |
-| `ExposedHeaders` | `[]` | Headers the browser may access in the response |
-| `AllowCredentials` | `false` | Allow cookies / HTTP auth. Incompatible with `"*"` origin |
-| `MaxAge` | `600` | Seconds to cache preflight response. Set to `-1` to omit |
+| Field              | Default                                        | Description                                               |
+| ------------------ | ---------------------------------------------- | --------------------------------------------------------- |
+| `AllowedOrigins`   | `["*"]`                                        | Origins allowed to make cross-origin requests             |
+| `AllowedMethods`   | `GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS` | Allowed HTTP methods                                      |
+| `AllowedHeaders`   | `Content-Type, Authorization`                  | Allowed request headers                                   |
+| `ExposedHeaders`   | `[]`                                           | Headers the browser may access in the response            |
+| `AllowCredentials` | `false`                                        | Allow cookies / HTTP auth. Incompatible with `"*"` origin |
+| `MaxAge`           | `600`                                          | Seconds to cache preflight response. Set to `-1` to omit  |
 
 Preflight (`OPTIONS`) requests are handled automatically: the middleware responds `204 No Content` and stops the chain.
+
+Preflight hardening behavior:
+
+- If `Access-Control-Request-Method` is present and not in `AllowedMethods`, the middleware returns `204` without CORS preflight allow headers.
+- If `Access-Control-Request-Headers` contains headers outside `AllowedHeaders` (case-insensitive), the middleware returns `204` without CORS preflight allow headers.
+- If `AllowCredentials=true` and `AllowedOrigins=["*"]`, the middleware reflects the incoming `Origin` (instead of `*`) to keep browser behavior compliant.
 
 ---
 
@@ -98,11 +104,11 @@ Fixed-window rate limiter per client IP. Excess requests receive `429 Too Many R
 
 Response headers set on every request:
 
-| Header | Description |
-|---|---|
-| `X-RateLimit-Limit` | Maximum requests allowed in the window |
-| `X-RateLimit-Remaining` | Requests remaining in the current window |
-| `Retry-After` | Seconds until the window resets (only on 429) |
+| Header                  | Description                                   |
+| ----------------------- | --------------------------------------------- |
+| `X-RateLimit-Limit`     | Maximum requests allowed in the window        |
+| `X-RateLimit-Remaining` | Requests remaining in the current window      |
+| `Retry-After`           | Seconds until the window resets (only on 429) |
 
 Client IP is resolved in order: `X-Forwarded-For` → `X-Real-IP` → `RemoteAddr`.
 
@@ -127,10 +133,10 @@ nexgou.Post("/login", c.Login).
 
 ### RateLimitGuard fields
 
-| Field | Type | Description |
-|---|---|---|
-| `Max` | `int` | Maximum requests allowed within `Window` |
-| `Window` | `time.Duration` | The time window for the counter |
+| Field    | Type            | Description                              |
+| -------- | --------------- | ---------------------------------------- |
+| `Max`    | `int`           | Maximum requests allowed within `Window` |
+| `Window` | `time.Duration` | The time window for the counter          |
 
 ---
 
@@ -156,8 +162,8 @@ nexgou.Get("/report", c.HeavyReport).
 
 ### TimeoutInterceptor fields
 
-| Field | Type | Description |
-|---|---|---|
+| Field      | Type            | Description                                  |
+| ---------- | --------------- | -------------------------------------------- |
 | `Duration` | `time.Duration` | Maximum time the handler may take to respond |
 
 > The per-route timeout overrides the global timeout for that specific route — the most restrictive deadline wins (whichever fires first).
@@ -186,8 +192,8 @@ nexgou.Post("/upload", c.Upload).
 
 ### BodyLimitInterceptor fields
 
-| Field | Type | Description |
-|---|---|---|
+| Field      | Type    | Description                        |
+| ---------- | ------- | ---------------------------------- |
 | `MaxBytes` | `int64` | Maximum allowed body size in bytes |
 
 ### Common size constants
@@ -241,6 +247,7 @@ nexgou.Post("/users", c.Create).
 ```
 
 In the example above, a request to `POST /users` is subject to:
+
 - Rate limit: whichever counter is exhausted first (global or route-level)
 - Timeout: `min(30s, 10s)` = 10 seconds (the per-route deadline fires first)
 - Body: `min(1 MB, 64 KB)` = 64 KB (the per-route limit fires first)

@@ -38,15 +38,15 @@ app.Use(middleware.SecurityHeaders(middleware.SecurityOptions{
 
 ### Campos de SecurityOptions
 
-| Campo | Por defecto | Descripción |
-|---|---|---|
-| `ContentSecurityPolicy` | `default-src 'self'` | Controla qué recursos puede cargar el navegador |
-| `XFrameOptions` | `DENY` | Previene clickjacking mediante incrustación con `<iframe>` |
-| `XContentTypeOptions` | `nosniff` | Previene el sniffing de tipos MIME |
-| `XXSSProtection` | `1; mode=block` | Habilita el filtro XSS del navegador (navegadores legacy) |
-| `StrictTransportSecurity` | `max-age=31536000; includeSubDomains` | Fuerza HTTPS durante 1 año |
-| `ReferrerPolicy` | `strict-origin-when-cross-origin` | Controla la cabecera `Referer` |
-| `PermissionsPolicy` | `geolocation=(), microphone=(), camera=()` | Restringe el acceso a funcionalidades del navegador |
+| Campo                     | Por defecto                                | Descripción                                                |
+| ------------------------- | ------------------------------------------ | ---------------------------------------------------------- |
+| `ContentSecurityPolicy`   | `default-src 'self'`                       | Controla qué recursos puede cargar el navegador            |
+| `XFrameOptions`           | `DENY`                                     | Previene clickjacking mediante incrustación con `<iframe>` |
+| `XContentTypeOptions`     | `nosniff`                                  | Previene el sniffing de tipos MIME                         |
+| `XXSSProtection`          | `1; mode=block`                            | Habilita el filtro XSS del navegador (navegadores legacy)  |
+| `StrictTransportSecurity` | `max-age=31536000; includeSubDomains`      | Fuerza HTTPS durante 1 año                                 |
+| `ReferrerPolicy`          | `strict-origin-when-cross-origin`          | Controla la cabecera `Referer`                             |
+| `PermissionsPolicy`       | `geolocation=(), microphone=(), camera=()` | Restringe el acceso a funcionalidades del navegador        |
 
 Establecer cualquier campo a `"-"` para omitir esa cabecera completamente.
 
@@ -79,16 +79,22 @@ app.Use(middleware.CorsWithOptions(middleware.CorsOptions{
 
 ### Campos de CorsOptions
 
-| Campo | Por defecto | Descripción |
-|---|---|---|
-| `AllowedOrigins` | `["*"]` | Orígenes autorizados a hacer solicitudes cross-origin |
-| `AllowedMethods` | `GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS` | Métodos HTTP permitidos |
-| `AllowedHeaders` | `Content-Type, Authorization` | Cabeceras de solicitud permitidas |
-| `ExposedHeaders` | `[]` | Cabeceras a las que el navegador puede acceder en la respuesta |
-| `AllowCredentials` | `false` | Permitir cookies / auth HTTP. Incompatible con origen `"*"` |
-| `MaxAge` | `600` | Segundos para almacenar en caché la respuesta de preflight. Usar `-1` para omitir |
+| Campo              | Por defecto                                    | Descripción                                                                       |
+| ------------------ | ---------------------------------------------- | --------------------------------------------------------------------------------- |
+| `AllowedOrigins`   | `["*"]`                                        | Orígenes autorizados a hacer solicitudes cross-origin                             |
+| `AllowedMethods`   | `GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS` | Métodos HTTP permitidos                                                           |
+| `AllowedHeaders`   | `Content-Type, Authorization`                  | Cabeceras de solicitud permitidas                                                 |
+| `ExposedHeaders`   | `[]`                                           | Cabeceras a las que el navegador puede acceder en la respuesta                    |
+| `AllowCredentials` | `false`                                        | Permitir cookies / auth HTTP. Incompatible con origen `"*"`                       |
+| `MaxAge`           | `600`                                          | Segundos para almacenar en caché la respuesta de preflight. Usar `-1` para omitir |
 
 Las solicitudes preflight (`OPTIONS`) se manejan automáticamente: el middleware responde `204 No Content` y detiene la cadena.
+
+Comportamiento de hardening para preflight:
+
+- Si `Access-Control-Request-Method` está presente y no está en `AllowedMethods`, el middleware devuelve `204` sin cabeceras de permiso de preflight.
+- Si `Access-Control-Request-Headers` incluye cabeceras fuera de `AllowedHeaders` (sin distinguir mayúsculas/minúsculas), el middleware devuelve `204` sin cabeceras de permiso de preflight.
+- Si `AllowCredentials=true` y `AllowedOrigins=["*"]`, el middleware refleja el `Origin` entrante (en lugar de `*`) para mantener compatibilidad con el comportamiento esperado por navegadores.
 
 ---
 
@@ -98,11 +104,11 @@ Limitador de tasa de ventana fija por IP del cliente. Las solicitudes excedentes
 
 Cabeceras de respuesta establecidas en cada solicitud:
 
-| Cabecera | Descripción |
-|---|---|
-| `X-RateLimit-Limit` | Máximo de solicitudes permitidas en la ventana |
-| `X-RateLimit-Remaining` | Solicitudes restantes en la ventana actual |
-| `Retry-After` | Segundos hasta que se reinicia la ventana (solo en 429) |
+| Cabecera                | Descripción                                             |
+| ----------------------- | ------------------------------------------------------- |
+| `X-RateLimit-Limit`     | Máximo de solicitudes permitidas en la ventana          |
+| `X-RateLimit-Remaining` | Solicitudes restantes en la ventana actual              |
+| `Retry-After`           | Segundos hasta que se reinicia la ventana (solo en 429) |
 
 La IP del cliente se resuelve en orden: `X-Forwarded-For` → `X-Real-IP` → `RemoteAddr`.
 
@@ -127,10 +133,10 @@ nexgou.Post("/login", c.Login).
 
 ### Campos de RateLimitGuard
 
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `Max` | `int` | Máximo de solicitudes permitidas dentro de `Window` |
-| `Window` | `time.Duration` | La ventana de tiempo para el contador |
+| Campo    | Tipo            | Descripción                                         |
+| -------- | --------------- | --------------------------------------------------- |
+| `Max`    | `int`           | Máximo de solicitudes permitidas dentro de `Window` |
+| `Window` | `time.Duration` | La ventana de tiempo para el contador               |
 
 ---
 
@@ -156,8 +162,8 @@ nexgou.Get("/report", c.HeavyReport).
 
 ### Campos de TimeoutInterceptor
 
-| Campo | Tipo | Descripción |
-|---|---|---|
+| Campo      | Tipo            | Descripción                                            |
+| ---------- | --------------- | ------------------------------------------------------ |
 | `Duration` | `time.Duration` | Tiempo máximo que el handler puede tardar en responder |
 
 > El timeout por ruta reemplaza el timeout global para esa ruta específica — el deadline más restrictivo gana (el que se dispara primero).
@@ -186,8 +192,8 @@ nexgou.Post("/upload", c.Upload).
 
 ### Campos de BodyLimitInterceptor
 
-| Campo | Tipo | Descripción |
-|---|---|---|
+| Campo      | Tipo    | Descripción                                 |
+| ---------- | ------- | ------------------------------------------- |
 | `MaxBytes` | `int64` | Tamaño máximo permitido del cuerpo en bytes |
 
 ### Constantes de tamaño comunes
@@ -241,6 +247,7 @@ nexgou.Post("/users", c.Create).
 ```
 
 En el ejemplo anterior, una solicitud a `POST /users` está sujeta a:
+
 - Límite de tasa: el contador que se agote primero (global o de nivel de ruta)
 - Timeout: `min(30s, 10s)` = 10 segundos (el deadline por ruta se dispara primero)
 - Cuerpo: `min(1 MB, 64 KB)` = 64 KB (el límite por ruta se dispara primero)
